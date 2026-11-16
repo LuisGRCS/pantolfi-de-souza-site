@@ -1,0 +1,17 @@
+# Dependências e builds
+node_modules/
+dist/
+.vercel/
+.astro/
+
+# Variáveis de ambiente (chaves de API nunca vão para o repositório)
+.env
+.env.*
+!.env.example
+
+# Arquivos de trabalho
+BRIEFING.md
+
+# Sistema
+.DS_Store
+*.log

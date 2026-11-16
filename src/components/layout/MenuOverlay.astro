@@ -1,0 +1,239 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import Logo from '@/components/ui/Logo.astro';
+import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
+import { isActive, navItems } from '@/lib/navigation';
+import { activeSocials, emailHref, phoneHref, settings, whatsappHref } from '@/lib/site';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const pathname = Astro.url.pathname;
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<dialog id="site-menu" class="menu" aria-label={t('menu.label')} data-menu>
+  <div class="menu-inner">
+    <div class="menu-top">
+      <Logo variant="horizontal-empilhado" height={64} class="menu-logo" />
+      <button type="button" class="menu-close" data-menu-close>
+        <span class="caps">{t('menu.close')}</span>
+        <Icon name="close" size={26} />
+      </button>
+    </div>
+
+    <nav class="menu-nav" aria-label={t('nav.main')}>
+      <ol>
+        {navItems.map((item, index) => (
+          <li style={`--i: ${index}`}>
+            <a
+              href={localizePath(item.href, lang)}
+              aria-current={isActive(item.href, pathname) ? 'page' : undefined}
+              data-menu-link
+            >
+              <span class="menu-index" aria-hidden="true">
+                {pad(index + 1)}
+              </span>
+              <span class="menu-text caps">{t(item.key)}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+
+    <div class="menu-bottom">
+      <div>
+        <p class="menu-heading caps">{t('menu.contacts')}</p>
+        <ul class="menu-contacts">
+          <li>
+            <a class="link-line" href={emailHref}>
+              {settings.email}
+            </a>
+          </li>
+          <li>
+            <a class="link-line" href={phoneHref}>
+              {settings.telefone}
+            </a>
+          </li>
+          <li>
+            <a class="link-line" href={whatsappHref} rel="noopener" target="_blank">
+              WhatsApp
+            </a>
+          </li>
+          <li>{settings.cidade}</li>
+        </ul>
+      </div>
+      {activeSocials.length > 0 && (
+        <div>
+          <p class="menu-heading caps">{t('menu.socials')}</p>
+          <ul class="menu-contacts">
+            {activeSocials.map((rede) => (
+              <li>
+                <a class="link-line" href={rede.url} rel="noopener" target="_blank">
+                  {rede.nome}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  </div>
+</dialog>
+
+<style>
+  .menu {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: var(--color-silver);
+    background: var(--color-primary);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* Cortina: desce ao abrir, sobe ao fechar */
+    transform: translateY(-100%);
+    transition:
+      transform var(--duration-slow) var(--ease-out),
+      overlay var(--duration-slow) allow-discrete,
+      display var(--duration-slow) allow-discrete;
+  }
+
+  .menu[open] {
+    transform: translateY(0);
+  }
+
+  @starting-style {
+    .menu[open] {
+      transform: translateY(-100%);
+    }
+  }
+
+  .menu::backdrop {
+    background: transparent;
+  }
+
+  .menu-inner {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100%;
+    padding: var(--space-md) var(--gutter) var(--space-lg);
+    max-width: calc(var(--container) + var(--gutter) * 2);
+    margin-inline: auto;
+  }
+
+  .menu-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .menu-top :global(.menu-logo) {
+    height: clamp(48px, 6vw, 64px);
+    width: auto;
+  }
+
+  .menu-close {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    min-height: 44px;
+    color: var(--color-white);
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font-size: var(--text-label);
+  }
+
+  .menu-close:hover {
+    color: var(--color-gold);
+  }
+
+  .menu-nav {
+    align-self: center;
+    padding-block: var(--space-lg);
+  }
+
+  .menu-nav ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: var(--line-width) solid var(--color-line);
+  }
+
+  .menu-nav li {
+    border-bottom: var(--line-width) solid var(--color-line);
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--duration-base) var(--ease-out),
+      transform var(--duration-base) var(--ease-out);
+    transition-delay: calc(0.25s + var(--i) * 0.06s);
+  }
+
+  @starting-style {
+    .menu[open] .menu-nav li {
+      opacity: 0;
+      transform: translateY(1.5rem);
+    }
+  }
+
+  .menu-nav a {
+    display: flex;
+    align-items: baseline;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    padding-block: clamp(0.75rem, 1.6vw, 1.25rem);
+    color: var(--color-white);
+  }
+
+  .menu-index {
+    min-width: 2ch;
+    color: var(--color-gold);
+    font-size: var(--text-small);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+  }
+
+  .menu-text {
+    font-size: var(--text-menu);
+    overflow-wrap: anywhere;
+    font-weight: var(--weight-light);
+    line-height: 1.1;
+    letter-spacing: 0.12em;
+    transition: transform var(--duration-base) var(--ease-out);
+  }
+
+  .menu-nav a:hover .menu-text,
+  .menu-nav a:focus-visible .menu-text {
+    transform: translateX(0.75rem);
+  }
+
+  .menu-nav a[aria-current='page'] .menu-text {
+    color: var(--color-gold);
+  }
+
+  .menu-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-lg) var(--space-xl);
+    font-size: var(--text-small);
+  }
+
+  .menu-heading {
+    margin: 0 0 var(--space-xs);
+    color: var(--color-gold);
+    font-size: var(--text-label);
+  }
+
+  .menu-contacts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.25rem;
+  }
+</style>

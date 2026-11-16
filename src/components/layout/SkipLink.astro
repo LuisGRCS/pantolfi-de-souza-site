@@ -1,0 +1,27 @@
+---
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+<a href="#conteudo" class="skip-link">
+  {t('a11y.skip')}
+</a>
+
+<style>
+  .skip-link {
+    position: fixed;
+    top: var(--space-sm);
+    left: var(--space-sm);
+    z-index: calc(var(--z-header) + 1);
+    padding: var(--space-xs) var(--space-sm);
+    color: var(--color-primary);
+    background: var(--color-gold);
+    font-size: var(--text-small);
+    transform: translateY(-200%);
+  }
+
+  .skip-link:focus {
+    transform: none;
+  }
+</style>

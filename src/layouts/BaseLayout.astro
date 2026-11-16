@@ -1,0 +1,52 @@
+---
+import '@/styles/global.css';
+import Footer from '@/components/layout/Footer.astro';
+import Header from '@/components/layout/Header.astro';
+import MenuOverlay from '@/components/layout/MenuOverlay.astro';
+import SearchModal from '@/components/layout/SearchModal.astro';
+import SkipLink from '@/components/layout/SkipLink.astro';
+import Seo from '@/components/layout/Seo.astro';
+import { getLangFromUrl, languages } from '@/i18n/utils';
+
+interface Props {
+  /** Nome da página (vira "[Página] — Luis Eduardo Pantolfi de Souza | Advogado"). */
+  title?: string;
+  description: string;
+  /** true quando a página abre com imagem em tela cheia sob o cabeçalho. */
+  overlayHeader?: boolean;
+  noindex?: boolean;
+}
+
+const { title, description, overlayHeader = false, noindex = false } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+---
+
+<!doctype html>
+<html lang={languages[lang]}>
+  <head>
+    <Seo title={title} description={description} noindex={noindex} />
+  </head>
+  <body>
+    <SkipLink />
+    <Header overlay={overlayHeader} />
+    <main id="conteudo" tabindex="-1" class:list={{ 'offset-header': !overlayHeader }}>
+      <slot />
+    </main>
+    <Footer />
+    <MenuOverlay />
+    <SearchModal />
+    <script>
+      import '@/scripts/app';
+    </script>
+  </body>
+</html>
+
+<style>
+  .offset-header {
+    padding-top: var(--header-height);
+  }
+
+  main:focus {
+    outline: none;
+  }
+</style>

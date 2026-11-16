@@ -1,0 +1,108 @@
+/*
+  TOKENS DE DESIGN — único lugar para trocar cores, fontes e medidas do site.
+  Alterar um valor aqui muda o site inteiro. Nenhum componente usa valor fixo.
+*/
+
+/*
+  FONTE PRINCIPAL DA MARCA (Engravers Gothic BT)
+  Quando a licença web for comprada:
+    1. coloque o arquivo em public/fonts/engravers-gothic-bt.woff2
+    2. remova os comentários do bloco @font-face abaixo
+    3. troque a linha --font-display (instrução logo abaixo, em :root)
+
+@font-face {
+  font-family: 'Engravers Gothic BT';
+  src: url('/fonts/engravers-gothic-bt.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
+:root {
+  /* ── Cores oficiais da marca ─────────────────────────────── */
+  --color-primary: #031822; /* fundo principal (azul-petróleo quase preto) */
+  --color-graphite: #2a3136; /* superfícies secundárias escuras */
+  --color-gold: #ba8d68; /* dourado do símbolo: destaques */
+  --color-gold-light: #f6ecb4; /* ponto claro do gradiente metálico */
+  --color-silver: #d1d3d4; /* texto sobre fundo escuro */
+  --color-white: #ffffff; /* títulos sobre fundo escuro */
+  --color-paper: #f5f2ec; /* fundo das seções claras (derivada) */
+  --color-ink: #2a3136; /* texto sobre fundo claro (grafite) */
+  --color-gold-text: #8a6440; /* dourado para texto em fundo claro (contraste AA) */
+  --color-line: rgba(209, 211, 212, 0.14); /* divisores sobre fundo escuro */
+  --color-line-ink: rgba(42, 49, 54, 0.16); /* divisores sobre fundo claro */
+  --color-muted: #9aa3a8; /* texto secundário sobre fundo escuro (contraste 7:1) */
+  --color-primary-glass: rgba(3, 24, 34, 0.55); /* cabeçalho translúcido sobre imagem */
+  --gradient-gold: linear-gradient(
+    135deg,
+    #ba8d68 0%,
+    #ba8d68 24%,
+    #f6ecb4 55%,
+    #ba8d68 85%
+  ); /* no máximo um elemento por tela */
+
+  /* ── Tipografia ──────────────────────────────────────────── */
+  /* Para ativar a Engravers Gothic BT, troque a linha abaixo por:
+     --font-display: 'Engravers Gothic BT', 'Lato', sans-serif;
+     e ajuste --tracking-caps para 0.14em */
+  --font-display: 'Lato', system-ui, sans-serif; /* só caixa-alta, textos curtos */
+  --font-body: 'Lato', system-ui, sans-serif;
+  --tracking-caps: 0.2em;
+  --tracking-tight: -0.01em;
+
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-bold: 700;
+
+  /* Escala fluida */
+  --text-hero: clamp(2.5rem, 5vw + 1rem, 5.5rem);
+  --text-h1: clamp(2.25rem, 3.6vw + 1rem, 4.25rem);
+  --text-h2: clamp(1.9rem, 2.6vw + 1rem, 3.25rem);
+  --text-h3: clamp(1.25rem, 0.8vw + 1rem, 1.625rem);
+  --text-lead: clamp(1.125rem, 0.5vw + 1rem, 1.375rem);
+  --text-body: clamp(1rem, 0.2vw + 0.95rem, 1.125rem);
+  --text-small: 0.875rem;
+  --text-label: 0.75rem;
+  --text-menu: clamp(1.375rem, 2.4vw + 0.5rem, 2.625rem);
+
+  --leading-tight: 1.08;
+  --leading-heading: 1.2;
+  --leading-body: 1.6;
+  --leading-prose: 1.7;
+  --measure: 68ch; /* largura de leitura do texto corrido */
+
+  /* ── Espaçamento e grade ─────────────────────────────────── */
+  --space-section: clamp(6rem, 12vw, 11rem);
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.5rem;
+  --space-xl: 4rem;
+  --container: 1320px;
+  --gutter: clamp(1.25rem, 4vw, 3rem); /* margem lateral */
+  --grid-gap: clamp(1rem, 2vw, 2rem);
+  --line-width: 1px;
+  --radius: 0; /* o símbolo é um quadrado: nada de cantos arredondados */
+
+  /* ── Cabeçalho ───────────────────────────────────────────── */
+  --header-height: 64px;
+  --logo-height: 40px;
+
+  /* ── Movimento (os efeitos maiores ficam em src/motion/config.ts) ── */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1); /* equivalente a expo.out */
+  --duration-fast: 0.3s;
+  --duration-base: 0.6s;
+  --duration-slow: 0.9s;
+
+  /* ── Camadas ─────────────────────────────────────────────── */
+  --z-header: 50;
+  --z-overlay: 100;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --header-height: 80px;
+    --logo-height: 44px;
+  }
+}

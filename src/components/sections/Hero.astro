@@ -1,0 +1,174 @@
+---
+import Button from '@/components/ui/Button.astro';
+import Placeholder from '@/components/ui/Placeholder.astro';
+import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
+import { settings } from '@/lib/site';
+
+interface Props {
+  tagline: string;
+}
+
+const { tagline } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section class="hero texture-ps" aria-labelledby="hero-title">
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="container-site hero-content">
+    <h1 id="hero-title" class="hero-title">
+      <Placeholder value={tagline} />
+    </h1>
+    <div class="hero-foot">
+      <span class="hero-rule" aria-hidden="true"></span>
+      <p class="hero-meta">
+        <span>{settings.nome}</span>
+        <span>{settings.posicionamento}</span>
+        <span>
+          {t('footer.registration')} <Placeholder value={settings.oab} />
+        </span>
+      </p>
+      <div class="hero-actions">
+        <Button href={localizePath('/areas', lang)} arrow>
+          {t('hero.areas')}
+        </Button>
+        <Button href={localizePath('/contato', lang)} variant="quiet">
+          {t('nav.contact')}
+        </Button>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll" aria-hidden="true">
+    <span></span>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: 100svh;
+    padding-top: calc(var(--header-height) + var(--space-xl));
+    padding-bottom: clamp(3rem, 9vh, 6rem);
+    overflow: hidden;
+  }
+
+  /* Escurece as bordas para dar profundidade ao fundo */
+  .hero-shade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(120% 90% at 85% 10%, rgba(42, 49, 54, 0.55), transparent 60%),
+      linear-gradient(to top, var(--color-primary) 0%, transparent 45%);
+  }
+
+  .hero-content {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--grid-gap);
+  }
+
+  .hero-title {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: var(--text-hero);
+    font-weight: var(--weight-light);
+    line-height: var(--leading-tight);
+    letter-spacing: -0.02em;
+    max-width: 16ch;
+  }
+
+  .hero-foot {
+    grid-column: 1 / -1;
+    margin-top: clamp(2.5rem, 7vh, 4.5rem);
+  }
+
+  /* Única aparição do gradiente metálico nesta tela */
+  .hero-rule {
+    display: block;
+    width: 96px;
+    height: var(--line-width);
+    background: var(--gradient-gold);
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.5rem;
+    margin: var(--space-md) 0 0;
+    color: var(--color-silver);
+    font-size: var(--text-small);
+    letter-spacing: 0.02em;
+  }
+
+  .hero-meta span:first-child {
+    color: var(--color-white);
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm) var(--space-lg);
+    margin-top: var(--space-lg);
+  }
+
+  .hero-scroll {
+    position: absolute;
+    left: var(--gutter);
+    bottom: 0;
+    width: var(--line-width);
+    height: clamp(2rem, 6vh, 4rem);
+    background: var(--color-line);
+    overflow: hidden;
+  }
+
+  .hero-scroll span {
+    display: block;
+    width: 100%;
+    height: 40%;
+    background: var(--color-gold);
+    animation: scroll-hint 2.4s var(--ease-out) infinite;
+  }
+
+  @keyframes scroll-hint {
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+      transform: translateY(250%);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero-foot {
+      display: grid;
+      grid-template-columns: subgrid;
+      align-items: end;
+    }
+    .hero-rule,
+    .hero-meta {
+      grid-column: 1 / span 7;
+    }
+    .hero-rule {
+      grid-row: 1;
+    }
+    .hero-meta {
+      grid-row: 2;
+    }
+    .hero-actions {
+      grid-column: 8 / -1;
+      grid-row: 2;
+      justify-content: flex-end;
+      margin-top: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-scroll span {
+      animation: none;
+    }
+  }
+</style>

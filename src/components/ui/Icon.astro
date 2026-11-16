@@ -1,0 +1,35 @@
+---
+/** Ícones de traço fino desenhados para o site (sem bibliotecas genéricas). */
+interface Props {
+  name: 'menu' | 'close' | 'phone' | 'search' | 'arrow';
+  size?: number;
+  class?: string;
+}
+
+const { name, size = 24, class: className } = Astro.props;
+
+const paths: Record<Props['name'], string> = {
+  menu: 'M3 7h18M3 12h18M3 17h18',
+  close: 'M5 5l14 14M19 5L5 19',
+  phone:
+    'M8.4 3.5H5.2A1.7 1.7 0 0 0 3.5 5.3c.4 8.1 7.1 14.8 15.2 15.2a1.7 1.7 0 0 0 1.8-1.7v-3.2l-4-1.6-2 2a12 12 0 0 1-5.5-5.5l2-2z',
+  search: 'M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM15.2 15.2L20 20',
+  arrow: 'M4 12h15M14 7l5 5-5 5',
+};
+---
+
+<svg
+  class={className}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1"
+  stroke-linecap="square"
+  stroke-linejoin="miter"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path d={paths[name]} vector-effect="non-scaling-stroke"></path>
+</svg>

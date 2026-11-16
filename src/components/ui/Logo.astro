@@ -1,0 +1,34 @@
+---
+/**
+ * Logotipo oficial (arquivos SVG em public/marca, já convertidos em curvas).
+ * Não recolorir, distorcer ou aplicar efeitos (regras do manual da marca).
+ */
+interface Props {
+  variant: 'horizontal' | 'simbolo' | 'horizontal-empilhado' | 'vertical';
+  height: number;
+  class?: string;
+  alt?: string;
+  eager?: boolean;
+}
+
+const sizes = {
+  horizontal: [386, 122.75],
+  simbolo: [185.5, 206.25],
+  'horizontal-empilhado': [306, 146.75],
+  vertical: [313, 309.25],
+} as const;
+
+const { variant, height, class: className, alt = '', eager = false } = Astro.props;
+const [w, h] = sizes[variant];
+const width = Math.round((w / h) * height);
+---
+
+<img
+  src={`/marca/${variant}_dourado-fundo-escuro.svg`}
+  width={width}
+  height={height}
+  alt={alt}
+  class={className}
+  loading={eager ? 'eager' : 'lazy'}
+  decoding="async"
+/>

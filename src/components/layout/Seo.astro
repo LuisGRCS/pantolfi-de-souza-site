@@ -1,0 +1,42 @@
+---
+/**
+ * Metadados de cada página. Sem <meta name="generator">.
+ * Dados estruturados, Open Graph completo e hreflang são concluídos na fase 7.
+ */
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import { settings } from '@/lib/site';
+
+interface Props {
+  title?: string | undefined;
+  description: string;
+  noindex?: boolean;
+}
+
+const { title, description, noindex = false } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
+const fullTitle = title
+  ? `${title} — ${settings.nome} | ${t('site.role')}`
+  : `${settings.nome} | ${settings.posicionamento}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex" />}
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<meta name="theme-color" content="#031822" />
+<meta name="format-detection" content="telephone=no" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={settings.nome} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:locale" content="pt_BR" />

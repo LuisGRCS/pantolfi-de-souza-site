@@ -1,0 +1,71 @@
+---
+/** Botão-link sóbrio, de cantos retos. "primary" tem contorno dourado; "quiet" é só texto. */
+import Icon from './Icon.astro';
+
+interface Props {
+  href: string;
+  variant?: 'primary' | 'quiet';
+  arrow?: boolean;
+}
+
+const { href, variant = 'primary', arrow = false } = Astro.props;
+---
+
+<a href={href} class:list={['button', `button--${variant}`]}>
+  <span>
+    <slot />
+  </span>
+  {arrow && <Icon name="arrow" size={18} class="button-arrow" />}
+</a>
+
+<style>
+  .button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    min-height: 52px;
+    padding-inline: var(--space-md);
+    font-size: var(--text-small);
+    letter-spacing: 0.04em;
+    color: var(--color-white);
+    border: var(--line-width) solid transparent;
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out);
+  }
+
+  .button--primary {
+    border-color: var(--color-gold);
+  }
+
+  .button--primary:hover {
+    color: var(--color-primary);
+    background-color: var(--color-gold);
+  }
+
+  .button--quiet {
+    padding-inline: 0;
+  }
+
+  .button--quiet span {
+    background-image: linear-gradient(var(--color-gold), var(--color-gold));
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 0% var(--line-width);
+    padding-bottom: 0.2em;
+    transition: background-size var(--duration-base) var(--ease-out);
+  }
+
+  .button--quiet:hover span {
+    background-size: 100% var(--line-width);
+  }
+
+  .button :global(.button-arrow) {
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  .button:hover :global(.button-arrow) {
+    transform: translateX(6px);
+  }
+</style>

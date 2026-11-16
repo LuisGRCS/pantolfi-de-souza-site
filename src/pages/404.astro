@@ -1,0 +1,73 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Button from '@/components/ui/Button.astro';
+import { useTranslations } from '@/i18n/utils';
+
+const t = useTranslations('pt');
+const links = [
+  { href: '/', label: t('nav.home') },
+  { href: '/areas', label: t('nav.areas') },
+  { href: '/publicacoes', label: t('nav.publications') },
+];
+---
+
+<BaseLayout title={t('404.title')} description={t('404.text')} noindex>
+  <section class="not-found container-site texture-ps">
+    <p class="code" aria-hidden="true">
+      404
+    </p>
+    <h1>{t('404.title')}</h1>
+    <p class="lead">{t('404.text')}</p>
+    <ul>
+      {links.map((link) => (
+        <li>
+          <Button href={link.href} variant="quiet" arrow>
+            {link.label}
+          </Button>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(100svh - var(--header-height));
+    padding-block: var(--space-section);
+  }
+
+  .code {
+    margin: 0 0 var(--space-md);
+    color: var(--color-gold);
+    font-size: var(--text-small);
+    letter-spacing: var(--tracking-caps);
+  }
+
+  h1 {
+    margin: 0;
+    max-width: 18ch;
+    font-size: var(--text-h1);
+    font-weight: var(--weight-light);
+  }
+
+  .lead {
+    max-width: 52ch;
+    margin: var(--space-md) 0 0;
+    font-size: var(--text-lead);
+    font-weight: var(--weight-light);
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm) var(--space-lg);
+    list-style: none;
+    margin: var(--space-xl) 0 0;
+    padding: 0;
+    border-top: var(--line-width) solid var(--color-line);
+    padding-top: var(--space-md);
+  }
+</style>

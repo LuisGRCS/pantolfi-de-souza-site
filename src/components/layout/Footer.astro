@@ -1,0 +1,187 @@
+---
+import Logo from '@/components/ui/Logo.astro';
+import Placeholder from '@/components/ui/Placeholder.astro';
+import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
+import { headerNavItems, legalItems } from '@/lib/navigation';
+import { activeSocials, emailHref, phoneHref, settings } from '@/lib/site';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container-site">
+    <div class="footer-grid">
+      <a
+        href={localizePath('/', lang)}
+        class="footer-logo"
+        aria-label={`${settings.nome} — ${t('a11y.home')}`}
+      >
+        <Logo variant="vertical" height={140} />
+      </a>
+
+      <address class="footer-block footer-contact">
+        <p class="footer-name">{settings.nome}</p>
+        <p>{settings.posicionamento}</p>
+        <p>
+          {t('footer.registration')} <Placeholder value={settings.oab} />
+        </p>
+        <p class="footer-gap">
+          <Placeholder value={settings.endereco} />
+        </p>
+        <p>{settings.cidade}</p>
+        <p class="footer-gap">
+          <span class="visually-hidden">{t('footer.phone')}: </span>
+          <a class="link-line" href={phoneHref}>
+            {settings.telefone}
+          </a>
+        </p>
+        <p>
+          <span class="visually-hidden">{t('footer.email')}: </span>
+          <a class="link-line" href={emailHref}>
+            {settings.email}
+          </a>
+        </p>
+      </address>
+
+      <nav class="footer-block" aria-label={t('nav.footer')}>
+        <ul>
+          {headerNavItems.map((item) => (
+            <li>
+              <a class="link-line" href={localizePath(item.href, lang)}>
+                {t(item.key)}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      {activeSocials.length > 0 && (
+        <div class="footer-block">
+          <ul>
+            {activeSocials.map((rede) => (
+              <li>
+                <a class="link-line" href={rede.url} rel="noopener" target="_blank">
+                  {rede.nome}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+
+    <div class="footer-bottom">
+      <p>
+        © {year} {settings.nome}. {t('footer.rights')}
+      </p>
+      <nav aria-label={t('nav.legal')}>
+        <ul>
+          {legalItems.map((item) => (
+            <li>
+              <a class="link-line" href={localizePath(item.href, lang)}>
+                {t(item.key)}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding-block: var(--space-xl) var(--space-lg);
+    border-top: var(--line-width) solid var(--color-line);
+    font-size: var(--text-small);
+    line-height: 1.7;
+  }
+
+  .footer-grid {
+    display: grid;
+    gap: var(--space-lg);
+    padding-bottom: var(--space-xl);
+  }
+
+  .footer-logo {
+    justify-self: start;
+  }
+
+  .footer-logo :global(img) {
+    height: clamp(110px, 12vw, 140px);
+    width: auto;
+  }
+
+  .footer-block p,
+  .footer-block ul {
+    margin: 0;
+  }
+
+  address {
+    font-style: normal;
+  }
+
+  .footer-name {
+    color: var(--color-white);
+  }
+
+  .footer-gap {
+    margin-top: var(--space-sm) !important;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .footer-block li + li {
+    margin-top: 0.25rem;
+  }
+
+  .footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-sm) var(--space-lg);
+    padding-top: var(--space-md);
+    border-top: var(--line-width) solid var(--color-line);
+    color: var(--color-muted);
+    font-size: var(--text-label);
+    letter-spacing: 0.02em;
+  }
+
+  .footer-bottom p {
+    margin: 0;
+  }
+
+  .footer-bottom ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    margin: 0;
+  }
+
+  @media (min-width: 768px) {
+    .footer-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--grid-gap);
+    }
+    .footer-logo {
+      grid-column: 1 / span 4;
+    }
+    .footer-block {
+      grid-column: span 4;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .footer-block {
+      grid-column: span 3;
+    }
+    .footer-contact {
+      grid-column: 6 / span 3;
+    }
+  }
+</style>
