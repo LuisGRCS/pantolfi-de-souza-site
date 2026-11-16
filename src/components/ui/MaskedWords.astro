@@ -36,8 +36,8 @@ const words = Astro.props.text.trim().split(/\s+/);
 
   /* No celular a entrada é um pouco mais curta, para o título aparecer mais cedo */
   :global(html.motion-ok) .mw-inner {
-    animation: mw-rise 0.8s var(--ease-out) both;
-    animation-delay: calc(var(--mw-delay, 0s) + var(--i) * 0.04s);
+    animation: mw-rise 0.6s var(--ease-out) both;
+    animation-delay: calc(var(--mw-delay, 0s) + var(--i) * 0.03s);
   }
 
   @media (min-width: 1024px) {

@@ -1,9 +1,12 @@
 ---
 /**
  * Metadados de cada página. Sem <meta name="generator">.
- * Dados estruturados, Open Graph completo e hreflang são concluídos na fase 7.
+ * Inclui título, descrição, endereço canônico, Open Graph, Twitter e dados estruturados.
+ * Quando o inglês for ativado, acrescentar aqui os links hreflang entre as versões.
  */
+import { PUBLIC_PLAUSIBLE_DOMAIN } from 'astro:env/client';
 import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import { siteGraph } from '@/lib/jsonld';
 import { settings } from '@/lib/site';
 
 interface Props {
@@ -13,6 +16,8 @@ interface Props {
   /** imagem de compartilhamento (caminho no site); padrão: /og/padrao.png */
   image?: string | undefined;
   type?: 'website' | 'article' | undefined;
+  /** dados estruturados específicos da página */
+  jsonLd?: Record<string, unknown>[] | undefined;
 }
 
 const {
@@ -21,7 +26,11 @@ const {
   noindex = false,
   image = '/og/padrao.png',
   type = 'website',
+  jsonLd = [],
 } = Astro.props;
+const site = Astro.site ?? new URL('https://pantolfi.com.br');
+// Evita que um texto com "</script>" encerre o bloco antes da hora.
+const toJson = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c');
 const imageUrl = new URL(image, Astro.site);
 const t = useTranslations(getLangFromUrl(Astro.url));
 const fullTitle = title
@@ -64,3 +73,20 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 <meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={imageUrl} />
+
+<script type="application/ld+json" set:html={toJson(siteGraph(site))} />
+{jsonLd.map((data) => (
+  <script type="application/ld+json" set:html={toJson(data)} />
+))}
+
+{
+  /* Métricas de visitas sem cookies (Plausible), só quando o domínio estiver configurado */
+  PUBLIC_PLAUSIBLE_DOMAIN && (
+    <script
+      is:inline
+      defer
+      data-domain={PUBLIC_PLAUSIBLE_DOMAIN}
+      src="https://plausible.io/js/script.js"
+    />
+  )
+}

@@ -21,7 +21,7 @@ const rest = publications.filter((p) => p !== featured);
   description={`Artigos, notas técnicas, palestras e entrevistas de ${settings.nome}.`}
 >
   <PageHeader title={t('nav.publications')} lead={t('pub.lead')} />
-  <section class="section pubs-section" data-section aria-label={t('nav.publications')}>
+  <section class="section pubs-section" data-section>
     <div class="container-site">
       {featured ? (
         <>

@@ -1,6 +1,5 @@
 ---
 import Icon from '@/components/ui/Icon.astro';
-import Logo from '@/components/ui/Logo.astro';
 import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
 import { headerNavItems, isActive } from '@/lib/navigation';
 import { phoneHref, settings } from '@/lib/site';
@@ -41,8 +40,21 @@ const pathname = Astro.url.pathname;
         class="brand"
         aria-label={`${settings.nome} — ${t('a11y.home')}`}
       >
-        <Logo variant="horizontal" height={44} class="brand-full" eager />
-        <Logo variant="simbolo" height={36} class="brand-mark" eager />
+        <picture>
+          <source
+            media="(min-width: 768px)"
+            srcset="/marca/horizontal_dourado-fundo-escuro.svg"
+            width="139"
+            height="44"
+          />
+          <img
+            src="/marca/simbolo_dourado-fundo-escuro.svg"
+            width="32"
+            height="36"
+            alt=""
+            fetchpriority="high"
+          />
+        </picture>
       </a>
     </div>
 
@@ -157,10 +169,6 @@ const pathname = Astro.url.pathname;
     width: auto;
   }
 
-  .brand :global(.brand-full) {
-    display: none;
-  }
-
   .center {
     display: none;
   }
@@ -224,15 +232,6 @@ const pathname = Astro.url.pathname;
 
   .search-button:hover {
     border-color: var(--color-gold);
-  }
-
-  @media (min-width: 768px) {
-    .brand :global(.brand-mark) {
-      display: none;
-    }
-    .brand :global(.brand-full) {
-      display: block;
-    }
   }
 
   @media (min-width: 1100px) {

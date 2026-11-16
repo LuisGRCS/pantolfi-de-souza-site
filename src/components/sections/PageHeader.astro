@@ -1,6 +1,7 @@
 ---
 /** Abertura das páginas internas: título editorial grande e texto de apoio. */
 import Placeholder from '@/components/ui/Placeholder.astro';
+import RevealTitle from '@/components/ui/RevealTitle.astro';
 
 interface Props {
   title: string;
@@ -18,11 +19,11 @@ const { title, lead, index } = Astro.props;
       <slot name="before" />
       {index && <span class="index-num">{index}</span>}
     </div>
-    <h1 id="page-title" class="page-title">
-      <Placeholder value={title} />
+    <h1 id="page-title" class="page-title" data-reveal-skip>
+      <RevealTitle value={title} />
     </h1>
     {lead && (
-      <p class="lead page-lead col-text" data-reveal>
+      <p class="lead page-lead col-text">
         <Placeholder value={lead} />
       </p>
     )}

@@ -25,6 +25,11 @@ const { pending, text } = placeholderDisplay(value);
 
 <style is:global>
   /* global: também usado no título do hero (src/components/sections/Hero.astro) */
+  .surface-paper .placeholder {
+    color: var(--color-ink);
+    background: color-mix(in srgb, var(--color-gold) 16%, transparent);
+  }
+
   .placeholder {
     background: color-mix(in srgb, var(--color-gold) 22%, transparent);
     color: inherit;

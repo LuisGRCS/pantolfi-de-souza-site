@@ -6,13 +6,33 @@
 */
 
 /* Antes do JavaScript dividir os títulos em linhas */
-html.motion-ok:not([data-motion-ready]) main :is(h1, h2):not([data-reveal-skip]) {
+html.motion-ok:not([data-motion-ready])
+  main
+  :is(h1, h2):not([data-reveal-skip]):not(:has(a, button)) {
   opacity: 0;
 }
 
 /* Blocos que surgem ao entrar na tela */
 html.motion-ok [data-reveal] {
   opacity: 0;
+}
+
+/* Blocos da primeira tela: surgem com CSS desde a primeira pintura */
+html.motion-ok [data-reveal][data-reveal-now] {
+  opacity: 1;
+  animation: reveal-rise 0.9s var(--ease-out) both;
+  animation-delay: calc(var(--reveal-delay, 0.15s) + var(--reveal-i, 0) * 0.08s);
+}
+
+html.intro [data-reveal][data-reveal-now] {
+  --reveal-delay: 0.85s;
+}
+
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
 }
 
 /* Quem navega pelo teclado vê o bloco assim que ele recebe o foco */

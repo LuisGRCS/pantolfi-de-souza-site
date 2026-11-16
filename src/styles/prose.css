@@ -149,9 +149,13 @@
 }
 
 .prose .footnotes a[data-footnote-backref] {
+  display: inline-block;
+  min-width: 24px;
   margin-left: 0.35em;
   color: var(--color-gold);
-  text-decoration: none;
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
 .prose :target {

@@ -8,6 +8,7 @@ import Placeholder from '@/components/ui/Placeholder.astro';
 import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { areaIndex, getAreaNames, getAreas } from '@/lib/content';
+import { breadcrumbs, faq } from '@/lib/jsonld';
 import { isPlaceholder, placeholderDisplay, settings } from '@/lib/site';
 import PublicationCard from '@/components/publications/PublicationCard.astro';
 import { byArea, getPublications } from '@/lib/publications';
@@ -33,9 +34,21 @@ const description =
   seoDescription && !isPlaceholder(seoDescription)
     ? seoDescription
     : `${plainTitle}: área de atuação de ${settings.nome}.`;
+
+const site = Astro.site ?? new URL('https://pantolfi.com.br');
+const faqData = faq(data.perguntas);
+const structured = [
+  breadcrumbs(site, [
+    { name: t('nav.home'), path: '/' },
+    { name: t('nav.areas'), path: '/areas' },
+    { name: plainTitle, path: `/areas/${area.id}` },
+  ]),
+  ...(faqData ? [faqData] : []),
+];
 ---
 
 <BaseLayout
+  jsonLd={structured}
   searchGroup={t('nav.areas')}
   title={data.seo?.titulo ?? plainTitle}
   description={description}

@@ -21,6 +21,7 @@ interface Props {
   type?: 'website' | 'article' | undefined;
   /** grupo nos resultados da busca; páginas sem grupo não entram na busca */
   searchGroup?: string | undefined;
+  jsonLd?: Record<string, unknown>[] | undefined;
 }
 
 const {
@@ -31,6 +32,7 @@ const {
   image,
   type,
   searchGroup,
+  jsonLd,
 } = Astro.props;
 const lang = getLangFromUrl(Astro.url);
 ---
@@ -38,7 +40,14 @@ const lang = getLangFromUrl(Astro.url);
 <!doctype html>
 <html lang={languages[lang]}>
   <head>
-    <Seo title={title} description={description} noindex={noindex} image={image} type={type} />
+    <Seo
+      title={title}
+      description={description}
+      noindex={noindex}
+      image={image}
+      type={type}
+      jsonLd={jsonLd}
+    />
     <script is:inline transition:persist="movimento-inicial">
       // Ativa o movimento só com JavaScript e sem pedido de movimento reduzido.
       // A abertura aparece uma única vez por sessão. Se o movimento não carregar
@@ -81,6 +90,21 @@ const lang = getLangFromUrl(Astro.url);
     <SectionIndex />
     <MenuOverlay />
     <SearchModal />
+    <script is:inline>
+      // Blocos já visíveis na primeira tela surgem só com CSS, sem esperar as animações.
+      (function () {
+        if (!document.documentElement.classList.contains('motion-ok')) return;
+        const limit = window.innerHeight * 0.95;
+        document.querySelectorAll('[data-reveal]').forEach(function (el) {
+          if (el.getBoundingClientRect().top < limit) el.setAttribute('data-reveal-now', '');
+        });
+        document.querySelectorAll('[data-reveal-group]').forEach(function (group) {
+          group.querySelectorAll('[data-reveal-now]').forEach(function (el, i) {
+            el.style.setProperty('--reveal-i', String(i));
+          });
+        });
+      })();
+    </script>
     <script>
       import '@/scripts/app';
     </script>

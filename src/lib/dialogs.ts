@@ -44,6 +44,14 @@ function bindDialog(name: 'menu' | 'search'): void {
     .querySelectorAll('a[href]')
     .forEach((link) => link.addEventListener('click', () => dialog.close()));
 
+  // Esc sempre fecha (no campo de busca, o padrão do navegador seria só apagar o texto).
+  dialog.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && dialog.open) {
+      event.preventDefault();
+      dialog.close();
+    }
+  });
+
   // Foco direto no campo de busca ao abrir.
   if (name === 'search') {
     dialog.addEventListener('toggle', () => {

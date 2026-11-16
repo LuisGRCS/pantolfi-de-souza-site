@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build && node scripts/indice-de-busca.mjs",
+    "build": "astro check && astro build && node scripts/indice-de-busca.mjs && node scripts/cabecalhos-de-seguranca.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "lint": "eslint .",

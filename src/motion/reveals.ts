@@ -8,6 +8,8 @@ import { isDesktop } from './env';
  * Convenções de marcação (usadas pelos componentes):
  *   - todo h1/h2 dentro de <main> revela linha a linha (data-reveal-skip desliga)
  *   - [data-reveal]        bloco que surge e sobe ao entrar na tela
+ *                          (os já visíveis ao abrir a página ganham data-reveal-now e
+ *                          surgem só com CSS; ver BaseLayout.astro e motion.css)
  *   - [data-reveal-group]  revela os filhos [data-reveal] em sequência
  *   - [data-hero-media]    fundo do hero: zoom de entrada e parallax
  *   - [data-parallax]      imagem editorial com parallax (só desktop)
@@ -35,7 +37,7 @@ interface RevealOptions {
 
 function revealHeadings(scope: ParentNode, delay: number): SplitText[] {
   const targets = gsap.utils.toArray<HTMLElement>(
-    scope.querySelectorAll('main :is(h1, h2):not([data-reveal-skip])'),
+    scope.querySelectorAll('main :is(h1, h2):not([data-reveal-skip]):not(:has(a, button))'),
   );
   return targets.map((heading) => {
     const split = SplitText.create(heading, {
@@ -62,8 +64,10 @@ function revealBlocks(scope: ParentNode, delay: number): void {
   const grouped = new Set<HTMLElement>();
 
   scope.querySelectorAll<HTMLElement>('[data-reveal-group]').forEach((group) => {
-    const items = gsap.utils.toArray<HTMLElement>(group.querySelectorAll('[data-reveal]'));
-    items.forEach((item) => grouped.add(item));
+    const items = gsap.utils.toArray<HTMLElement>(
+      group.querySelectorAll('[data-reveal]:not([data-reveal-now])'),
+    );
+    group.querySelectorAll<HTMLElement>('[data-reveal]').forEach((item) => grouped.add(item));
     if (items.length === 0) return;
     gsap.fromTo(
       items,
@@ -79,7 +83,7 @@ function revealBlocks(scope: ParentNode, delay: number): void {
     );
   });
 
-  scope.querySelectorAll<HTMLElement>('[data-reveal]').forEach((item) => {
+  scope.querySelectorAll<HTMLElement>('[data-reveal]:not([data-reveal-now])').forEach((item) => {
     if (grouped.has(item)) return;
     gsap.fromTo(
       item,

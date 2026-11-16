@@ -16,7 +16,7 @@ const clean = (text: string) => text.replace(/^\[PREENCHER:\s*(.*)\]$/, '[PREENC
 
 {headings.length > 1 && (
   <nav class="toc" aria-labelledby="toc-title" data-toc data-pagefind-ignore>
-    <details class="toc-details" open data-toc-details>
+    <details class="toc-details" data-toc-details>
       <summary id="toc-title" class="section-label">
         {t('pub.toc')}
       </summary>
@@ -39,7 +39,7 @@ const clean = (text: string) => text.replace(/^\[PREENCHER:\s*(.*)\]$/, '[PREENC
     if (!toc) return;
     const details = toc.querySelector<HTMLDetailsElement>('[data-toc-details]');
     const desktop = window.matchMedia('(min-width: 1024px)');
-    // No celular começa recolhido; no computador, aberto.
+    // Começa recolhido (celular); no computador, onde fica numa coluna própria, abre.
     if (details) details.open = desktop.matches;
 
     const links = [...toc.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
@@ -98,7 +98,7 @@ const clean = (text: string) => text.replace(/^\[PREENCHER:\s*(.*)\]$/, '[PREENC
     margin: 0;
     padding: 0 0 var(--space-md);
     display: grid;
-    gap: 0.5rem;
+    gap: 0.25rem;
   }
 
   .toc-depth-3 {
@@ -107,6 +107,7 @@ const clean = (text: string) => text.replace(/^\[PREENCHER:\s*(.*)\]$/, '[PREENC
 
   a {
     display: block;
+    padding-block: 0.25rem;
     padding-left: var(--space-sm);
     border-left: var(--line-width) solid var(--color-line);
     color: var(--color-muted);

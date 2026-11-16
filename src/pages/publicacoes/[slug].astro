@@ -10,6 +10,7 @@ import TableOfContents from '@/components/publications/TableOfContents.astro';
 import VideoEmbed from '@/components/publications/VideoEmbed.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
 import Placeholder from '@/components/ui/Placeholder.astro';
+import RevealTitle from '@/components/ui/RevealTitle.astro';
 import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getAreaNames } from '@/lib/content';
@@ -22,6 +23,7 @@ import {
   relatedTo,
   typeKey,
 } from '@/lib/publications';
+import { article, breadcrumbs } from '@/lib/jsonld';
 import { isPlaceholder, placeholderDisplay } from '@/lib/site';
 
 export const getStaticPaths = (async () => {
@@ -51,9 +53,21 @@ const shareImage = data.capa
 
 const seoDescription = data.seo?.descricao ?? data.resumo;
 const description = isPlaceholder(seoDescription) ? title : seoDescription;
+
+const site = Astro.site ?? new URL('https://pantolfi.com.br');
+const path = `/publicacoes/${publication.id}`;
+const structured = [
+  article(site, { title, description, path, date: data.data, image: shareImage }),
+  breadcrumbs(site, [
+    { name: t('nav.home'), path: '/' },
+    { name: t('nav.publications'), path: '/publicacoes' },
+    { name: title, path },
+  ]),
+];
 ---
 
 <BaseLayout
+  jsonLd={structured}
   searchGroup={t('nav.publications')}
   title={data.seo?.titulo ?? title}
   description={description}
@@ -80,8 +94,8 @@ const description = isPlaceholder(seoDescription) ? title : seoDescription;
             </span>
           )}
         </p>
-        <h1 class="article-title">
-          <Placeholder value={data.titulo} />
+        <h1 class="article-title" data-reveal-skip>
+          <RevealTitle value={data.titulo} />
         </h1>
         <p class="lead article-summary col-text" data-reveal>
           <Placeholder value={data.resumo} />

@@ -22,16 +22,22 @@
     display: none;
     align-items: center;
     gap: var(--space-sm);
+    padding: 0.4rem 0.65rem;
     color: var(--color-gold);
+    background: var(--color-primary);
     font-size: var(--text-label);
     letter-spacing: 0.12em;
     font-variant-numeric: tabular-nums;
-    transition: color var(--duration-base) var(--ease-out);
+    transition:
+      color var(--duration-base) var(--ease-out),
+      background-color var(--duration-base) var(--ease-out);
     pointer-events: none;
   }
 
+  /* O fundo acompanha a seção, para os números nunca ficarem sobre o texto */
   .section-index[data-surface='paper'] {
     color: var(--color-gold-text);
+    background: var(--color-paper);
   }
 
   .sep {

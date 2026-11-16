@@ -14,7 +14,8 @@ export default defineConfig({
   integrations: [react(), keystatic()],
   redirects: { '/admin': '/keystatic' },
   trailingSlash: 'never',
-  build: { assets: 'assets' },
+  // CSS embutido em cada página: o conteúdo aparece sem esperar outro arquivo.
+  build: { assets: 'assets', inlineStylesheets: 'always' },
   devToolbar: { enabled: false },
   prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
   markdown: {
@@ -39,6 +40,11 @@ export default defineConfig({
         access: 'secret',
         optional: true,
       }),
+      PUBLIC_PLAUSIBLE_DOMAIN: envField.string({
+        context: 'client',
+        access: 'public',
+        optional: true,
+      }),
       PUBLIC_TURNSTILE_SITE_KEY: envField.string({
         context: 'client',
         access: 'public',
@@ -55,6 +61,9 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    // Scripts sempre em arquivos próprios (nunca embutidos na página): mantém a
+    // política de segurança (CSP) estrita, sem liberar scripts embutidos genéricos.
+    build: { assetsInlineLimit: 0 },
     // Arquivos finais com nomes neutros (apenas o código de conteúdo).
     environments: {
       client: {

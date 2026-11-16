@@ -1,0 +1,24 @@
+---
+/**
+ * Texto de título que surge palavra a palavra só com CSS (sem esperar o JavaScript),
+ * usado nos títulos principais (H1), que são o primeiro conteúdo de cada página.
+ * Marcadores [PREENCHER] continuam destacados.
+ */
+import { placeholderDisplay } from '@/lib/site';
+import MaskedWords from './MaskedWords.astro';
+
+interface Props {
+  value: string;
+}
+
+const { value } = Astro.props;
+const { pending, text } = placeholderDisplay(value);
+---
+
+{pending ? (
+  <mark class="placeholder" title={value}>
+    <MaskedWords text={text} />
+  </mark>
+) : (
+  <MaskedWords text={text} />
+)}

@@ -1,5 +1,6 @@
 ---
 import Placeholder from '@/components/ui/Placeholder.astro';
+import RevealTitle from '@/components/ui/RevealTitle.astro';
 import Portrait from '@/components/ui/Portrait.astro';
 import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -34,8 +35,8 @@ const nextLinks = [
     <div class="container-site grid-12 about-hero-grid">
       <div class="about-hero-text">
         <p class="section-label">{about.titulo}</p>
-        <h1 id="page-title" class="about-title">
-          <Placeholder value={about.abertura} />
+        <h1 id="page-title" class="about-title" data-reveal-skip>
+          <RevealTitle value={about.abertura} />
         </h1>
         <p class="about-name" data-reveal>
           {settings.nome}

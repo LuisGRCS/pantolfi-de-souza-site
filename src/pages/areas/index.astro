@@ -16,7 +16,7 @@ const areas = await getAreas();
   description={`Áreas de atuação de ${settings.nome}, ${settings.posicionamento}.`}
 >
   <PageHeader title={t('nav.areas')} lead={t('areas.lead')} />
-  <section class="section areas-section" data-section aria-label={t('nav.areas')}>
+  <section class="section areas-section" data-section>
     <div class="container-site">
       <AreasList areas={areas} summaries="visible" headingLevel="h2" />
     </div>
