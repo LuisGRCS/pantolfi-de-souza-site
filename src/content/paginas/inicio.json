@@ -1,4 +1,25 @@
 {
   "tagline": "[PREENCHER: tagline — ex.: Advocacia técnica, próxima e discreta.]",
-  "descricao": "[PREENCHER: descrição da página inicial para buscadores, até 160 caracteres]"
+  "bioCurta": "[PREENCHER: bio curta — dois ou três períodos sobre quem é o advogado, sua formação e a forma de trabalhar]",
+  "principios": [
+    {
+      "titulo": "[PREENCHER: princípio 1]",
+      "resumo": "[PREENCHER: descrição curta do princípio 1, em uma ou duas frases]",
+      "texto": "[PREENCHER: texto mais longo do princípio 1, exibido na página Sobre]"
+    },
+    {
+      "titulo": "[PREENCHER: princípio 2]",
+      "resumo": "[PREENCHER: descrição curta do princípio 2, em uma ou duas frases]",
+      "texto": "[PREENCHER: texto mais longo do princípio 2, exibido na página Sobre]"
+    },
+    {
+      "titulo": "[PREENCHER: princípio 3]",
+      "resumo": "[PREENCHER: descrição curta do princípio 3, em uma ou duas frases]",
+      "texto": "[PREENCHER: texto mais longo do princípio 3, exibido na página Sobre]"
+    }
+  ],
+  "contatoTitulo": "Vamos conversar.",
+  "seo": {
+    "descricao": "[PREENCHER: descrição da página inicial para buscadores, até 160 caracteres]"
+  }
 }

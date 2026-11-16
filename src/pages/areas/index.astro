@@ -1,0 +1,29 @@
+---
+import AreasList from '@/components/sections/AreasList.astro';
+import PageHeader from '@/components/sections/PageHeader.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getAreas } from '@/lib/content';
+import { settings } from '@/lib/site';
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+const areas = await getAreas();
+---
+
+<BaseLayout
+  title={t('nav.areas')}
+  description={`Áreas de atuação de ${settings.nome}, ${settings.posicionamento}.`}
+>
+  <PageHeader title={t('nav.areas')} lead={t('areas.lead')} />
+  <section class="section areas-section" data-section aria-label={t('nav.areas')}>
+    <div class="container-site">
+      <AreasList areas={areas} summaries="visible" headingLevel="h2" />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .areas-section {
+    padding-top: 0;
+  }
+</style>

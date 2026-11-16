@@ -1,0 +1,8 @@
+# Marco da trajetória. Tipos: formacao, atuacao, academico, reconhecimento.
+periodo: '[PREENCHER: ano ou período]'
+ordem: 1
+tipo: formacao
+cargo: '[PREENCHER: cargo, curso ou título]'
+instituicao: '[PREENCHER: instituição]'
+descricao: '[PREENCHER: descrição breve do marco]'
+destaque: true

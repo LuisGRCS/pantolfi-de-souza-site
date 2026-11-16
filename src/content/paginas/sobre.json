@@ -1,0 +1,26 @@
+{
+  "titulo": "Sobre",
+  "abertura": "[PREENCHER: frase de abertura da página Sobre, em uma linha]",
+  "biografia": [
+    "[PREENCHER: bio longa — primeiro bloco: trajetória e formação]",
+    "[PREENCHER: bio longa — segundo bloco: atuação e forma de trabalhar]",
+    "[PREENCHER: bio longa — terceiro bloco: interesses acadêmicos e publicações]"
+  ],
+  "formacao": [
+    {
+      "curso": "[PREENCHER: curso de graduação]",
+      "instituicao": "[PREENCHER: instituição]",
+      "ano": "[PREENCHER: ano]"
+    },
+    {
+      "curso": "[PREENCHER: pós-graduação ou curso]",
+      "instituicao": "[PREENCHER: instituição]",
+      "ano": "[PREENCHER: ano]"
+    }
+  ],
+  "idiomas": ["[PREENCHER: idiomas]"],
+  "associacoes": ["[PREENCHER: associações profissionais e comissões da OAB]"],
+  "seo": {
+    "descricao": "[PREENCHER: descrição da página Sobre para buscadores, até 160 caracteres]"
+  }
+}

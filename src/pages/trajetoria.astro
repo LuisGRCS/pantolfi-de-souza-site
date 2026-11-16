@@ -1,0 +1,59 @@
+---
+import PageHeader from '@/components/sections/PageHeader.astro';
+import Stats from '@/components/sections/Stats.astro';
+import Timeline from '@/components/sections/Timeline.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getTimeline, yearsOfPractice } from '@/lib/content';
+import { settings } from '@/lib/site';
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+const items = await getTimeline();
+
+// Contagens de publicações e palestras entram com a coleção de publicações (fase 4).
+const stats = [
+  { value: yearsOfPractice(), label: t('career.years'), pending: settings.anoInscricaoOab },
+];
+---
+
+<BaseLayout title={t('nav.career')} description={`Trajetória profissional de ${settings.nome}.`}>
+  <PageHeader title={t('nav.career')} lead={t('career.lead')} />
+
+  <section
+    class="section surface-paper"
+    data-section
+    data-surface="paper"
+    aria-labelledby="numbers-title"
+  >
+    <div class="container-site grid-12">
+      <h2 id="numbers-title" class="section-label col-label">
+        {t('career.numbers')}
+      </h2>
+      <div class="col-content">
+        <Stats items={stats} />
+      </div>
+    </div>
+  </section>
+
+  <section
+    class="section surface-paper timeline-section"
+    data-section
+    data-surface="paper"
+    aria-labelledby="timeline-title"
+  >
+    <div class="container-site grid-12">
+      <h2 id="timeline-title" class="section-label col-label">
+        {t('career.timeline')}
+      </h2>
+      <div class="col-content">
+        <Timeline items={items} />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .timeline-section {
+    padding-top: 0;
+  }
+</style>

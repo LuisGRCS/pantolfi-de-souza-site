@@ -13,7 +13,12 @@ html.motion-ok:not([data-motion-ready]) main :is(h1, h2):not([data-reveal-skip])
 /* Blocos que surgem ao entrar na tela */
 html.motion-ok [data-reveal] {
   opacity: 0;
-  visibility: hidden;
+}
+
+/* Quem navega pelo teclado vê o bloco assim que ele recebe o foco */
+html.motion-ok [data-reveal]:focus-within {
+  opacity: 1 !important;
+  transform: none !important;
 }
 
 /* Rolagem suave (estilos recomendados pelo Lenis) */

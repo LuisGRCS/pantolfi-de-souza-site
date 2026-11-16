@@ -1,0 +1,343 @@
+---
+import Placeholder from '@/components/ui/Placeholder.astro';
+import Portrait from '@/components/ui/Portrait.astro';
+import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getAbout, getHome } from '@/lib/content';
+import { isPlaceholder, settings } from '@/lib/site';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const about = await getAbout();
+const { principios } = await getHome();
+const pad = (n: number) => String(n).padStart(2, '0');
+
+const seoDescription = about.seo?.descricao;
+const description =
+  seoDescription && !isPlaceholder(seoDescription)
+    ? seoDescription
+    : `${settings.nome}: formação, trajetória e forma de trabalhar.`;
+
+const nextLinks = [
+  { href: localizePath('/trajetoria', lang), label: t('nav.career') },
+  { href: localizePath('/publicacoes', lang), label: t('nav.publications') },
+];
+---
+
+<BaseLayout title={about.seo?.titulo ?? about.titulo} description={description}>
+  <!-- Abertura: retrato grande e título editorial -->
+  <section class="about-hero" data-section aria-labelledby="page-title">
+    <div class="container-site grid-12 about-hero-grid">
+      <div class="about-hero-text">
+        <p class="section-label">{about.titulo}</p>
+        <h1 id="page-title" class="about-title">
+          <Placeholder value={about.abertura} />
+        </h1>
+        <p class="about-name" data-reveal>
+          {settings.nome}
+          <span>{settings.posicionamento}</span>
+        </p>
+      </div>
+      <div class="about-portrait" data-reveal>
+        <Portrait
+          image={about.retrato}
+          alt={about.retratoAlt}
+          sizes="(min-width: 1024px) 38vw, 90vw"
+          priority
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- Biografia em blocos curtos -->
+  <section
+    class="section surface-paper"
+    data-section
+    data-surface="paper"
+    aria-labelledby="bio-title"
+  >
+    <div class="container-site grid-12">
+      <h2 id="bio-title" class="section-label col-label">
+        {t('about.bio')}
+      </h2>
+      <div class="col-text bio">
+        {about.biografia.map((block) => (
+          <p data-reveal>
+            <Placeholder value={block} />
+          </p>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Formação acadêmica -->
+  <section
+    class="section surface-paper section--tight"
+    data-section
+    data-surface="paper"
+    aria-labelledby="education-title"
+  >
+    <div class="container-site grid-12">
+      <h2 id="education-title" class="section-label col-label">
+        {t('about.education')}
+      </h2>
+      <ul class="col-content rows" data-reveal-group>
+        {about.formacao.map((item) => (
+          <li class="row rule-top" data-draw-line data-reveal>
+            <span class="index-num">
+              <Placeholder value={item.ano} />
+            </span>
+            <span class="row-main">
+              <span class="row-title">
+                <Placeholder value={item.curso} />
+              </span>
+              <span class="row-sub">
+                <Placeholder value={item.instituicao} />
+              </span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Valores e forma de trabalhar -->
+  <section class="section texture-ps" data-section aria-labelledby="values-title">
+    <div class="container-site grid-12">
+      <h2 id="values-title" class="section-label col-label">
+        {t('about.principles')}
+      </h2>
+      <ol class="col-content values" data-reveal-group>
+        {principios.map((principle, i) => (
+          <li class="value rule-top" data-draw-line data-reveal>
+            <span class="index-num">{pad(i + 1)}</span>
+            <div>
+              <h3 class="value-title" data-reveal-skip>
+                <Placeholder value={principle.titulo} />
+              </h3>
+              <p class="value-text">
+                <Placeholder value={principle.texto} />
+              </p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- Idiomas, associações e comissões -->
+  <section
+    class="section section--tight"
+    data-section
+    aria-label={`${t('about.languages')} · ${t('about.associations')}`}
+  >
+    <div class="container-site grid-12">
+      <div class="col-content facts" data-reveal-group>
+        <div class="rule-top" data-draw-line data-reveal>
+          <h2 class="section-label">{t('about.languages')}</h2>
+          <ul>
+            {about.idiomas.map((item) => (
+              <li>
+                <Placeholder value={item} />
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="rule-top" data-draw-line data-reveal>
+          <h2 class="section-label">{t('about.associations')}</h2>
+          <ul>
+            {about.associacoes.map((item) => (
+              <li>
+                <Placeholder value={item} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chamada final -->
+  <nav class="next" aria-label={t('about.next')}>
+    <ul class="container-site">
+      {nextLinks.map((link) => (
+        <li class="rule-top" data-draw-line data-reveal>
+          <a href={link.href} class="next-link">
+            <span class="caps">{link.label}</span>
+            <span class="next-arrow" aria-hidden="true" />
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</BaseLayout>
+
+<style>
+  .about-hero {
+    padding-block: clamp(3rem, 8vw, 7rem);
+  }
+
+  .about-hero-grid {
+    align-items: end;
+  }
+
+  .about-hero-text {
+    display: grid;
+    gap: var(--space-lg);
+  }
+
+  .about-title {
+    margin: 0;
+    max-width: 16ch;
+    font-size: var(--text-h1);
+    font-weight: var(--weight-light);
+    line-height: var(--leading-tight);
+    letter-spacing: -0.02em;
+  }
+
+  .about-name {
+    display: grid;
+    gap: 0.2rem;
+    margin: 0;
+    color: var(--color-white);
+  }
+
+  .about-name span {
+    color: var(--color-silver);
+    font-size: var(--text-small);
+  }
+
+  @media (min-width: 1024px) {
+    .about-hero-grid > .about-hero-text {
+      grid-column: 1 / span 6;
+      padding-bottom: var(--space-lg);
+    }
+    .about-hero-grid > .about-portrait {
+      grid-column: 8 / -1;
+    }
+  }
+
+  .section--tight {
+    padding-top: 0;
+  }
+
+  .bio {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .bio p {
+    margin: 0;
+    max-width: var(--measure);
+    font-size: var(--text-lead);
+    font-weight: var(--weight-light);
+    line-height: 1.6;
+  }
+
+  .rows,
+  .values {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .row,
+  .value {
+    display: grid;
+    gap: var(--space-xs) var(--grid-gap);
+    padding-block: var(--space-md);
+  }
+
+  .row-main {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .row-title {
+    color: var(--color-ink);
+    font-size: var(--text-h3);
+    font-weight: var(--weight-light);
+  }
+
+  .row-sub {
+    font-size: var(--text-small);
+  }
+
+  .value {
+    padding-block: var(--space-lg);
+  }
+
+  .value-title {
+    margin: 0 0 var(--space-sm);
+    font-size: var(--text-h3);
+    font-weight: var(--weight-light);
+  }
+
+  .value-text {
+    max-width: var(--measure);
+    margin: 0;
+  }
+
+  @media (min-width: 768px) {
+    .row,
+    .value {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 7fr);
+      align-items: baseline;
+    }
+  }
+
+  .facts {
+    display: grid;
+    gap: var(--space-lg) var(--grid-gap);
+  }
+
+  .facts > div {
+    padding-top: var(--space-md);
+  }
+
+  .facts ul {
+    list-style: none;
+    margin: var(--space-sm) 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .next ul {
+    list-style: none;
+    margin: 0 auto;
+    padding-bottom: var(--space-section);
+  }
+
+  .next-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-md);
+    padding-block: clamp(1.5rem, 3vw, 2.5rem);
+    color: var(--color-white);
+    font-size: clamp(1.25rem, 2vw + 0.5rem, 2.25rem);
+    font-weight: var(--weight-light);
+  }
+
+  .next-link:hover {
+    color: var(--color-gold);
+  }
+
+  .next-arrow {
+    width: clamp(28px, 3vw, 44px);
+    height: var(--line-width);
+    background: var(--color-gold);
+    transition: width var(--duration-base) var(--ease-out);
+  }
+
+  .next-link:hover .next-arrow {
+    width: clamp(40px, 5vw, 72px);
+  }
+</style>

@@ -1,0 +1,132 @@
+---
+/**
+ * Lista de áreas em linhas largas (A.01, A.02…). Na página inicial, o resumo
+ * aparece ao passar o mouse; na página de áreas, fica sempre visível.
+ */
+import type { CollectionEntry } from 'astro:content';
+import Icon from '@/components/ui/Icon.astro';
+import Placeholder from '@/components/ui/Placeholder.astro';
+import { getLangFromUrl, localizePath } from '@/i18n/utils';
+import { areaIndex } from '@/lib/content';
+
+interface Props {
+  areas: CollectionEntry<'areas'>[];
+  summaries?: 'hover' | 'visible';
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { areas, summaries = 'hover', headingLevel: Heading = 'h3' } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+---
+
+<ol class:list={['areas', `areas--${summaries}`]} data-reveal-group>
+  {areas.map((area, i) => (
+    <li class="area rule-top" data-draw-line data-reveal>
+      <a href={localizePath(`/areas/${area.id}`, lang)} class="area-link">
+        <span class="index-num area-index">{areaIndex(i + 1)}</span>
+        <span class="area-body">
+          <Heading class="area-title" data-reveal-skip>
+            <Placeholder value={area.data.titulo} />
+          </Heading>
+          <span class="area-summary">
+            <span>
+              <Placeholder value={area.data.resumo} />
+            </span>
+          </span>
+        </span>
+        <Icon name="arrow" size={22} class="area-arrow" />
+      </a>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .areas {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-bottom: var(--line-width) solid var(--color-line);
+  }
+
+  .area-link {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: var(--space-sm);
+    padding-block: clamp(1.5rem, 2.6vw, 2.25rem);
+  }
+
+  .area-index {
+    padding-top: 0.2em;
+  }
+
+  .area-title {
+    margin: 0;
+    color: var(--color-white);
+    font-family: var(--font-display);
+    font-size: clamp(1.0625rem, 1.1vw + 0.7rem, 1.625rem);
+    font-weight: var(--weight-regular);
+    letter-spacing: 0.14em;
+    line-height: 1.35;
+    text-transform: uppercase;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .area-summary {
+    display: grid;
+    grid-template-rows: 1fr;
+    color: var(--color-silver);
+    font-size: var(--text-body);
+    font-weight: var(--weight-light);
+  }
+
+  .area-summary > span {
+    overflow: hidden;
+    max-width: 60ch;
+    padding-top: var(--space-xs);
+  }
+
+  .area-link :global(.area-arrow) {
+    align-self: center;
+    color: var(--color-gold);
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  .area-link:hover :global(.area-arrow),
+  .area-link:focus-visible :global(.area-arrow) {
+    transform: translateX(6px);
+  }
+
+  .area-link:hover .area-title {
+    color: var(--color-gold);
+  }
+
+  /* Resumo que se abre no hover (somente em telas com mouse) */
+  @media (hover: hover) and (pointer: fine) {
+    .areas--hover .area-summary {
+      grid-template-rows: 0fr;
+      opacity: 0;
+      transition:
+        grid-template-rows var(--duration-base) var(--ease-out),
+        opacity var(--duration-base) var(--ease-out);
+    }
+
+    .areas--hover .area-link:hover .area-summary,
+    .areas--hover .area-link:focus-visible .area-summary {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .area-link {
+      grid-template-columns: 7rem minmax(0, 1fr) auto;
+      column-gap: var(--grid-gap);
+    }
+
+    /* Na página de áreas a lista ocupa a largura toda e segue a grade de 12 colunas */
+    .areas--visible .area-link {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 9fr) auto;
+    }
+  }
+</style>

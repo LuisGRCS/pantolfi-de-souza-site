@@ -6,6 +6,7 @@ const settingsSchema = z.object({
   nome: z.string().min(1),
   posicionamento: z.string().min(1),
   oab: z.string().min(1),
+  anoInscricaoOab: z.string().min(1),
   telefone: z.string().min(1),
   whatsapp: z.string().regex(/^\d{12,13}$/, 'Use apenas números, com 55 e DDD'),
   email: z.email(),

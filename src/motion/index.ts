@@ -4,7 +4,9 @@ import { SplitText } from 'gsap/SplitText';
 import type { DialogToggleDetail } from '@/lib/dialogs';
 import { motionConfig } from './config';
 import { getLenis, resetLenis, startLenis } from './lenis';
+import { initPrinciples } from './principles';
 import { initReveals } from './reveals';
+import { initTimeline } from './timeline';
 
 /**
  * Sistema de movimento. Carregado uma única vez, de forma diferida,
@@ -31,9 +33,12 @@ export function startPageMotion(): () => void {
   else resetLenis();
   firstPage = false;
 
+  // A seção fixada vem antes dos reveals (ela retira seus itens da animação de entrada).
+  const stopPrinciples = initPrinciples();
   const stopReveals = initReveals(document, {
     delay: intro ? motionConfig.intro.contentDelay : 0,
   });
+  const stopTimeline = initTimeline();
 
   // Recalcula as posições quando as fontes terminam de carregar.
   void document.fonts.ready.then(() => ScrollTrigger.refresh());
@@ -42,7 +47,9 @@ export function startPageMotion(): () => void {
   if (intro) window.setTimeout(() => root.classList.remove('intro'), 1300);
 
   return () => {
+    stopTimeline();
     stopReveals();
+    stopPrinciples();
     ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
   };
 }

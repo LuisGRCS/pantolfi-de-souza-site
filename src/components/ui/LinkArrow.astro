@@ -1,0 +1,60 @@
+---
+/** Link de texto com seta que desliza ao passar o mouse. */
+import Icon from './Icon.astro';
+
+interface Props {
+  href: string;
+}
+
+const { href } = Astro.props;
+---
+
+<a href={href} class="link-arrow">
+  <span class="link-arrow-text">
+    <slot />
+  </span>
+  <Icon name="arrow" size={18} class="link-arrow-icon" />
+</a>
+
+<style>
+  .link-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    min-height: 44px;
+    font-size: var(--text-small);
+    letter-spacing: 0.02em;
+  }
+
+  .link-arrow-text {
+    background-image: linear-gradient(var(--color-gold), var(--color-gold));
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 0% var(--line-width);
+    padding-bottom: 0.2em;
+    transition: background-size var(--duration-base) var(--ease-out);
+  }
+
+  :global(.surface-paper) .link-arrow-text {
+    background-image: linear-gradient(var(--color-gold-text), var(--color-gold-text));
+  }
+
+  .link-arrow:hover .link-arrow-text,
+  .link-arrow:focus-visible .link-arrow-text {
+    background-size: 100% var(--line-width);
+  }
+
+  .link-arrow :global(.link-arrow-icon) {
+    flex: none;
+    color: var(--color-gold);
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  :global(.surface-paper) .link-arrow :global(.link-arrow-icon) {
+    color: var(--color-gold-text);
+  }
+
+  .link-arrow:hover :global(.link-arrow-icon) {
+    transform: translateX(6px);
+  }
+</style>

@@ -178,7 +178,97 @@
     mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
   }
 
-  /* Somente para leitores de tela */
+  /* Seções e grade editorial de 12 colunas */
+  .section {
+    position: relative;
+    padding-block: var(--space-section);
+  }
+
+  .grid-12 {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--grid-gap);
+    row-gap: var(--space-lg);
+  }
+
+  .grid-12 > * {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 1024px) {
+    .grid-12 > .col-label {
+      grid-column: 1 / span 3;
+    }
+    .grid-12 > .col-content {
+      grid-column: 4 / -1;
+    }
+    .grid-12 > .col-text {
+      grid-column: 4 / span 7;
+    }
+  }
+
+  /* Título de seção curto, em caixa-alta espaçada */
+  .section-label {
+    margin: 0;
+    color: var(--color-silver);
+    font-family: var(--font-display);
+    font-size: var(--text-small);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-caps);
+    line-height: 1.5;
+    text-transform: uppercase;
+  }
+
+  .surface-paper .section-label {
+    color: var(--color-ink);
+  }
+
+  /* Texto de abertura de seção */
+  .lead {
+    margin: 0;
+    color: var(--color-white);
+    font-size: var(--text-lead);
+    font-weight: var(--weight-light);
+    line-height: 1.5;
+    max-width: 40ch;
+  }
+
+  .surface-paper .lead {
+    color: var(--color-ink);
+  }
+
+  /* Índice editorial em dourado (A.01, 01 / 06…) */
+  .index-num {
+    color: var(--color-gold);
+    font-size: var(--text-small);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+  }
+
+  .surface-paper .index-num {
+    color: var(--color-gold-text);
+  }
+
+  /* Divisor fino que se desenha da esquerda (ver src/motion/lines.ts) */
+  .rule-top {
+    position: relative;
+  }
+  .rule-top::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: var(--line-width);
+    background: var(--color-line);
+    transform-origin: left;
+    transition: transform var(--duration-slow) var(--ease-out);
+  }
+  .surface-paper .rule-top::before {
+    background: var(--color-line-ink);
+  }
+  html.motion-ok .rule-top[data-draw-line]:not([data-drawn])::before {
+    transform: scaleX(0);
+  }
+
   .visually-hidden {
     position: absolute;
     width: 1px;

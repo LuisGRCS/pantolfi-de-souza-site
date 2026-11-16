@@ -1,14 +1,53 @@
 ---
+import AreasList from '@/components/sections/AreasList.astro';
+import ContactBand from '@/components/sections/ContactBand.astro';
 import Hero from '@/components/sections/Hero.astro';
-import inicio from '@/content/paginas/inicio.json';
+import Intro from '@/components/sections/Intro.astro';
+import TimelineSummary from '@/components/sections/TimelineSummary.astro';
+import WorkingPrinciples from '@/components/sections/WorkingPrinciples.astro';
+import LinkArrow from '@/components/ui/LinkArrow.astro';
+import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getAreas, getHome } from '@/lib/content';
 import { isPlaceholder, settings } from '@/lib/site';
 
-const description = isPlaceholder(inicio.descricao)
-  ? `${settings.nome} — ${settings.posicionamento}. ${settings.cidade}.`
-  : inicio.descricao;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const home = await getHome();
+const areas = await getAreas();
+
+const seoDescription = home.seo?.descricao;
+const description =
+  seoDescription && !isPlaceholder(seoDescription)
+    ? seoDescription
+    : `${settings.nome} — ${settings.posicionamento}. ${settings.cidade}.`;
 ---
 
-<BaseLayout description={description} overlayHeader>
-  <Hero tagline={inicio.tagline} />
+<BaseLayout title={home.seo?.titulo} description={description} overlayHeader>
+  <Hero tagline={home.tagline} image={home.imagemHero} />
+  <Intro />
+
+  <section class="section" data-section aria-labelledby="areas-title">
+    <div class="container-site grid-12">
+      <h2 id="areas-title" class="section-label col-label">
+        {t('home.areas')}
+      </h2>
+      <div class="col-content">
+        <AreasList areas={areas} />
+        <div class="section-link" data-reveal>
+          <LinkArrow href={localizePath('/areas', lang)}>{t('home.areas.link')}</LinkArrow>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <WorkingPrinciples />
+  <TimelineSummary />
+  <ContactBand />
 </BaseLayout>
+
+<style>
+  .section-link {
+    margin-top: var(--space-lg);
+  }
+</style>

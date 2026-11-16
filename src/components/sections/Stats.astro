@@ -1,0 +1,69 @@
+---
+/**
+ * Números permitidos pela OAB: anos de atuação, publicações, palestras.
+ * Proibido: casos ganhos, valores recuperados, número de clientes (Provimento 205/2021).
+ */
+import Placeholder from '@/components/ui/Placeholder.astro';
+
+interface Props {
+  items: { value: number | null; label: string; pending: string }[];
+}
+
+const { items } = Astro.props;
+---
+
+<dl class="stats" data-reveal-group>
+  {items.map((item) => (
+    <div class="stat rule-top" data-reveal>
+      <dt class="stat-label">{item.label}</dt>
+      <dd class="stat-value">
+        {item.value === null ? (
+          <Placeholder value={item.pending} />
+        ) : (
+          <span data-count-to={item.value}>{item.value}</span>
+        )}
+      </dd>
+    </div>
+  ))}
+</dl>
+
+<style>
+  .stats {
+    display: grid;
+    gap: var(--space-lg) var(--grid-gap);
+    margin: 0;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: var(--space-xs);
+    padding-top: var(--space-md);
+  }
+
+  .stat-label {
+    max-width: 24ch;
+    font-size: var(--text-small);
+  }
+
+  .stat-value {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: clamp(2.75rem, 5vw, 4.5rem);
+    font-weight: var(--weight-light);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Enquanto o número não for preenchido, o aviso aparece em tamanho de texto */
+  .stat-value:has(:global(.placeholder)) {
+    font-size: var(--text-body);
+    line-height: 1.5;
+  }
+
+  @media (min-width: 768px) {
+    .stats {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

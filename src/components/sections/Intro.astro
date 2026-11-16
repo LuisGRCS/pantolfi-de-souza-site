@@ -1,0 +1,77 @@
+---
+import LinkArrow from '@/components/ui/LinkArrow.astro';
+import Paragraphs from '@/components/ui/Paragraphs.astro';
+import Portrait from '@/components/ui/Portrait.astro';
+import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
+import { getHome } from '@/lib/content';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const home = await getHome();
+---
+
+<section
+  class="section surface-paper intro"
+  data-section
+  data-surface="paper"
+  aria-labelledby="intro-title"
+>
+  <div class="container-site grid-12 intro-grid">
+    <div class="intro-portrait" data-reveal>
+      <Portrait
+        image={home.retrato}
+        alt={home.retratoAlt}
+        sizes="(min-width: 1024px) 34vw, 90vw"
+        parallax
+      />
+    </div>
+    <div class="intro-text">
+      <h2 id="intro-title" class="section-label">
+        {t('home.intro')}
+      </h2>
+      <div class="intro-bio">
+        <Paragraphs text={home.bioCurta} class="lead" reveal />
+      </div>
+      <div data-reveal>
+        <LinkArrow href={localizePath('/sobre', lang)}>{t('home.intro.link')}</LinkArrow>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .intro-grid {
+    align-items: end;
+  }
+
+  .intro-portrait {
+    max-width: 420px;
+  }
+
+  .intro-text {
+    display: grid;
+    gap: var(--space-lg);
+  }
+
+  .intro-bio {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .intro-bio :global(.lead) {
+    max-width: 34ch;
+    font-size: clamp(1.375rem, 1.2vw + 1rem, 2rem);
+    line-height: 1.4;
+  }
+
+  @media (min-width: 1024px) {
+    .intro-grid > .intro-portrait {
+      grid-column: 1 / span 5;
+      max-width: none;
+    }
+    .intro-grid > .intro-text {
+      grid-column: 7 / -1;
+      padding-bottom: var(--space-md);
+    }
+  }
+</style>

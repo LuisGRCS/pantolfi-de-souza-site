@@ -12,7 +12,7 @@ import { getLangFromUrl, languages } from '@/i18n/utils';
 
 interface Props {
   /** Nome da página (vira "[Página] — Luis Eduardo Pantolfi de Souza | Advogado"). */
-  title?: string;
+  title?: string | undefined;
   description: string;
   /** true quando a página abre com imagem em tela cheia sob o cabeçalho. */
   overlayHeader?: boolean;

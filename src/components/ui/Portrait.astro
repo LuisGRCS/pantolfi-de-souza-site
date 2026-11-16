@@ -1,0 +1,89 @@
+---
+/**
+ * Retrato do advogado. Enquanto a foto não for enviada, mostra um quadro
+ * na cor da marca com o símbolo e o aviso de pendência.
+ */
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import Placeholder from './Placeholder.astro';
+
+interface Props {
+  image?: ImageMetadata | undefined;
+  alt?: string | undefined;
+  sizes: string;
+  priority?: boolean;
+  parallax?: boolean;
+}
+
+const { image, alt = '', sizes, priority = false, parallax = false } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+<figure class="portrait">
+  {image ? (
+    <Picture
+      src={image}
+      alt={alt}
+      sizes={sizes}
+      widths={[480, 720, 960, 1280]}
+      formats={['avif', 'webp']}
+      loading={priority ? 'eager' : 'lazy'}
+      fetchpriority={priority ? 'high' : 'auto'}
+      class="portrait-img"
+      data-parallax={parallax ? '' : undefined}
+    />
+  ) : (
+    <div class="portrait-empty">
+      <img
+        src="/marca/simbolo_dourado-fundo-escuro.svg"
+        width="72"
+        height="80"
+        alt=""
+        loading="lazy"
+      />
+      <figcaption>
+        <Placeholder value={t('portrait.pending')} />
+      </figcaption>
+    </div>
+  )}
+</figure>
+
+<style>
+  .portrait {
+    position: relative;
+    margin: 0;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--color-graphite);
+  }
+
+  .portrait :global(.portrait-img) {
+    width: 100%;
+    height: 116%;
+    object-fit: cover;
+    filter: saturate(0.82) contrast(1.02);
+  }
+
+  .portrait-empty {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: var(--space-md);
+    height: 100%;
+    padding: var(--space-md);
+    color: var(--color-silver);
+    text-align: center;
+    background:
+      linear-gradient(160deg, rgba(42, 49, 54, 0.9), var(--color-primary)), var(--color-primary);
+  }
+
+  .portrait-empty img {
+    opacity: 0.55;
+  }
+
+  figcaption {
+    font-size: var(--text-label);
+    letter-spacing: 0.04em;
+  }
+</style>

@@ -1,0 +1,61 @@
+---
+/** Abertura das páginas internas: título editorial grande e texto de apoio. */
+import Placeholder from '@/components/ui/Placeholder.astro';
+
+interface Props {
+  title: string;
+  lead?: string | undefined;
+  /** índice editorial opcional exibido acima do título (ex.: A.01) */
+  index?: string | undefined;
+}
+
+const { title, lead, index } = Astro.props;
+---
+
+<section class="page-header" data-section aria-labelledby="page-title">
+  <div class="container-site grid-12">
+    <div class="page-header-top">
+      <slot name="before" />
+      {index && <span class="index-num">{index}</span>}
+    </div>
+    <h1 id="page-title" class="page-title">
+      <Placeholder value={title} />
+    </h1>
+    {lead && (
+      <p class="lead page-lead col-text" data-reveal>
+        <Placeholder value={lead} />
+      </p>
+    )}
+  </div>
+</section>
+
+<style>
+  .page-header {
+    padding-top: clamp(4rem, 10vw, 8rem);
+    padding-bottom: clamp(3rem, 6vw, 5rem);
+  }
+
+  .page-header-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-sm) var(--space-lg);
+  }
+
+  .page-header-top:empty {
+    display: none;
+  }
+
+  .page-title {
+    margin: 0;
+    max-width: 20ch;
+    font-size: var(--text-h1);
+    font-weight: var(--weight-light);
+    line-height: var(--leading-tight);
+    letter-spacing: -0.02em;
+  }
+
+  .page-lead {
+    max-width: 46ch;
+  }
+</style>

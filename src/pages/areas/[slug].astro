@@ -1,0 +1,222 @@
+---
+import type { GetStaticPaths } from 'astro';
+import PageHeader from '@/components/sections/PageHeader.astro';
+import Accordion from '@/components/ui/Accordion.astro';
+import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import Paragraphs from '@/components/ui/Paragraphs.astro';
+import Placeholder from '@/components/ui/Placeholder.astro';
+import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { areaIndex, getAreas } from '@/lib/content';
+import { isPlaceholder, placeholderDisplay, settings } from '@/lib/site';
+
+export const getStaticPaths = (async () => {
+  const areas = await getAreas();
+  return areas.map((area, i) => ({
+    params: { slug: area.id },
+    props: { area, position: i + 1, next: areas[(i + 1) % areas.length] ?? area },
+  }));
+}) satisfies GetStaticPaths;
+
+const { area, position, next } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const { data } = area;
+const plainTitle = placeholderDisplay(data.titulo).text;
+
+const seoDescription = data.seo?.descricao;
+const description =
+  seoDescription && !isPlaceholder(seoDescription)
+    ? seoDescription
+    : `${plainTitle}: área de atuação de ${settings.nome}.`;
+---
+
+<BaseLayout title={data.seo?.titulo ?? plainTitle} description={description}>
+  <PageHeader title={data.titulo} lead={data.resumo} index={areaIndex(position)}>
+    <Breadcrumb
+      slot="before"
+      items={[{ label: t('nav.areas'), href: localizePath('/areas', lang) }, { label: plainTitle }]}
+    />
+  </PageHeader>
+
+  <section class="section area-section" data-section aria-labelledby="overview-title">
+    <div class="container-site grid-12">
+      <h2 id="overview-title" class="section-label col-label">
+        {t('areas.overview')}
+      </h2>
+      <div class="col-text prose">
+        <Paragraphs text={data.visaoGeral} reveal />
+      </div>
+    </div>
+  </section>
+
+  <section
+    class="section surface-paper"
+    data-section
+    data-surface="paper"
+    aria-labelledby="how-title"
+  >
+    <div class="container-site grid-12">
+      <h2 id="how-title" class="section-label col-label">
+        {t('areas.how')}
+      </h2>
+      <ul class="col-content services" data-reveal-group>
+        {data.comoAtuo.map((service) => (
+          <li class="service rule-top" data-draw-line data-reveal>
+            <h3 class="service-title" data-reveal-skip>
+              <Placeholder value={service.titulo} />
+            </h3>
+            <p>
+              <Placeholder value={service.descricao} />
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section
+    class="section surface-paper section--tight"
+    data-section
+    data-surface="paper"
+    aria-labelledby="who-title"
+  >
+    <div class="container-site grid-12">
+      <h2 id="who-title" class="section-label col-label">
+        {t('areas.who')}
+      </h2>
+      <ul class="col-text audience" data-reveal-group>
+        {data.paraQuem.map((profile) => (
+          <li class="rule-top" data-draw-line data-reveal>
+            <Placeholder value={profile} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {data.perguntas.length > 0 && (
+    <section class="section" data-section aria-labelledby="faq-title">
+      <div class="container-site grid-12">
+        <h2 id="faq-title" class="section-label col-label">
+          {t('areas.faq')}
+        </h2>
+        <div class="col-text">
+          <Accordion items={data.perguntas} />
+          <p class="faq-note">{t('areas.faq.note')}</p>
+        </div>
+      </div>
+    </section>
+  )}
+
+  {next.id !== area.id && (
+    <nav class="next-area" aria-label={t('areas.next')}>
+      <a
+        href={localizePath(`/areas/${next.id}`, lang)}
+        class="container-site next-area-link rule-top"
+      >
+        <span class="section-label">{t('areas.next')}</span>
+        <span class="next-area-title">
+          <Placeholder value={next.data.titulo} />
+        </span>
+      </a>
+    </nav>
+  )}
+</BaseLayout>
+
+<style>
+  .area-section {
+    padding-top: 0;
+  }
+
+  .section--tight {
+    padding-top: 0;
+  }
+
+  .prose {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .prose :global(p) {
+    margin: 0;
+    max-width: var(--measure);
+    font-size: var(--text-lead);
+    font-weight: var(--weight-light);
+    line-height: 1.6;
+  }
+
+  .services {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0 var(--grid-gap);
+  }
+
+  .service {
+    padding-block: var(--space-md) var(--space-lg);
+  }
+
+  .service-title {
+    margin: 0 0 var(--space-xs);
+    font-family: var(--font-display);
+    font-size: var(--text-small);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+  }
+
+  .service p {
+    margin: 0;
+    max-width: 44ch;
+  }
+
+  @media (min-width: 768px) {
+    .services {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .audience {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-bottom: var(--line-width) solid var(--color-line-ink);
+  }
+
+  .audience li {
+    padding-block: var(--space-sm);
+    font-size: var(--text-lead);
+    font-weight: var(--weight-light);
+  }
+
+  .faq-note {
+    margin: var(--space-md) 0 0;
+    color: var(--color-muted);
+    font-size: var(--text-small);
+  }
+
+  .next-area-link {
+    display: grid;
+    gap: var(--space-sm);
+    padding-block: var(--space-xl) var(--space-section);
+  }
+
+  .next-area-link::before {
+    left: var(--gutter);
+    right: var(--gutter);
+  }
+
+  .next-area-title {
+    color: var(--color-white);
+    font-size: var(--text-h2);
+    font-weight: var(--weight-light);
+    line-height: var(--leading-heading);
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .next-area-link:hover .next-area-title {
+    color: var(--color-gold);
+  }
+</style>

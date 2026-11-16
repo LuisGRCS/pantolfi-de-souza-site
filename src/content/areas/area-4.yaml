@@ -1,0 +1,23 @@
+# Área de atuação. Use "área de atuação", nunca "especialista em" (Provimento 205/2021).
+titulo: '[PREENCHER: nome da área 4 — ex.: Consultoria Preventiva]'
+ordem: 4
+resumo: '[PREENCHER: resumo da área 4 em uma frase]'
+visaoGeral: |
+  [PREENCHER: visão geral da área 4 — primeiro parágrafo]
+
+  [PREENCHER: visão geral da área 4 — segundo parágrafo]
+comoAtuo:
+  - titulo: '[PREENCHER: serviço — ex.: Consultivo]'
+    descricao: '[PREENCHER: o que é feito neste serviço]'
+  - titulo: '[PREENCHER: serviço — ex.: Preventivo]'
+    descricao: '[PREENCHER: o que é feito neste serviço]'
+  - titulo: '[PREENCHER: serviço — ex.: Contencioso]'
+    descricao: '[PREENCHER: o que é feito neste serviço]'
+paraQuem:
+  - '[PREENCHER: perfil atendido, sem citar clientes]'
+  - '[PREENCHER: perfil atendido, sem citar clientes]'
+perguntas:
+  - pergunta: '[PREENCHER: pergunta frequente de caráter informativo]'
+    resposta: '[PREENCHER: resposta informativa, sem prometer resultados]'
+  - pergunta: '[PREENCHER: pergunta frequente de caráter informativo]'
+    resposta: '[PREENCHER: resposta informativa, sem prometer resultados]'

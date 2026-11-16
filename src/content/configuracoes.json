@@ -2,12 +2,18 @@
   "nome": "Luis Eduardo Pantolfi de Souza",
   "posicionamento": "Advocacia Empresarial",
   "oab": "[PREENCHER: número da OAB/SP]",
+  "anoInscricaoOab": "[PREENCHER: ano de inscrição na OAB]",
   "telefone": "(11) 97507-3970",
   "whatsapp": "5511975073970",
   "email": "luiseduardo@pantolfi.com.br",
   "cidade": "São Paulo – Morumbi",
   "endereco": "[PREENCHER: endereço completo]",
   "horario": "[PREENCHER: horário de atendimento]",
-  "redes": [{ "nome": "LinkedIn", "url": "" }],
+  "redes": [
+    {
+      "nome": "LinkedIn",
+      "url": ""
+    }
+  ],
   "inglesAtivo": false
 }

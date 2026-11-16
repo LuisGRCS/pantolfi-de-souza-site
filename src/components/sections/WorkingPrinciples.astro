@@ -1,0 +1,152 @@
+---
+/**
+ * "Forma de trabalhar". No computador, com movimento ativo, a seção fica fixada
+ * e cada princípio substitui o anterior conforme a rolagem (src/motion/principles.ts).
+ * No celular, sem JavaScript ou com movimento reduzido, os princípios aparecem em lista.
+ */
+import Placeholder from '@/components/ui/Placeholder.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import { getHome } from '@/lib/content';
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+const { principios } = await getHome();
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<section
+  class="principles texture-ps"
+  data-section
+  data-principles
+  aria-labelledby="principles-title"
+>
+  <div class="principles-inner container-site grid-12">
+    <h2 id="principles-title" class="section-label col-label">
+      {t('home.principles')}
+    </h2>
+
+    <div class="principles-stage col-content">
+      <div class="principles-numbers" aria-hidden="true">
+        {principios.map((_, i) => (
+          <span class="principles-number" data-principle-number>
+            {pad(i + 1)}
+          </span>
+        ))}
+      </div>
+
+      <ol class="principles-list" data-reveal-group>
+        {principios.map((principle, i) => (
+          <li class="principle rule-top" data-principle data-reveal>
+            <span class="index-num principle-index">
+              {pad(i + 1)} / {pad(principios.length)}
+            </span>
+            <h3 class="principle-title" data-reveal-skip>
+              <Placeholder value={principle.titulo} />
+            </h3>
+            <p class="principle-text">
+              <Placeholder value={principle.resumo} />
+            </p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .principles {
+    padding-block: var(--space-section);
+    overflow: hidden;
+  }
+
+  .principles-numbers {
+    display: none;
+  }
+
+  .principles-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+  }
+
+  .principle {
+    display: grid;
+    gap: var(--space-sm);
+    padding-block: var(--space-lg);
+  }
+
+  .principle-title {
+    margin: 0;
+    font-size: var(--text-h2);
+    font-weight: var(--weight-light);
+    line-height: var(--leading-heading);
+    max-width: 18ch;
+  }
+
+  .principle-text {
+    margin: 0;
+    max-width: 52ch;
+    font-size: var(--text-lead);
+    font-weight: var(--weight-light);
+  }
+
+  /* ── Modo fixado (ativado pelo JavaScript no computador) ── */
+  .principles.is-pinned {
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+    padding-block: calc(var(--header-height) + var(--space-lg)) var(--space-lg);
+  }
+
+  .principles.is-pinned .principles-inner {
+    align-items: center;
+  }
+
+  .principles.is-pinned .principles-stage {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 5fr);
+    align-items: center;
+    column-gap: var(--grid-gap);
+  }
+
+  .principles.is-pinned .principles-numbers {
+    display: grid;
+  }
+
+  .principles.is-pinned .principles-list {
+    display: grid;
+  }
+
+  /* Números e textos ocupam a mesma célula e se substituem */
+  .principles.is-pinned .principles-number,
+  .principles.is-pinned .principle {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: translateY(2rem);
+    transition:
+      opacity var(--duration-base) var(--ease-out),
+      transform var(--duration-slow) var(--ease-out);
+  }
+
+  .principles.is-pinned .principle::before {
+    display: none;
+  }
+
+  .principles.is-pinned :is(.principles-number, .principle)[data-past] {
+    transform: translateY(-2rem);
+  }
+
+  .principles.is-pinned :is(.principles-number, .principle)[data-active] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .principles-number {
+    color: var(--color-gold);
+    font-size: clamp(7rem, 16vw, 15rem);
+    font-weight: var(--weight-light);
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

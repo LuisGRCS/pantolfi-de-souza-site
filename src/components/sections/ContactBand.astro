@@ -1,0 +1,77 @@
+---
+import Button from '@/components/ui/Button.astro';
+import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
+import { getHome } from '@/lib/content';
+import { emailHref, phoneHref, settings } from '@/lib/site';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const { contatoTitulo } = await getHome();
+---
+
+<section class="section contact-band" data-section aria-labelledby="contact-band-title">
+  <div class="container-site grid-12">
+    <h2 id="contact-band-title" class="contact-title">
+      {contatoTitulo}
+    </h2>
+    <dl class="contact-channels col-text" data-reveal>
+      <div>
+        <dt class="section-label">{t('home.contact.email')}</dt>
+        <dd>
+          <a class="link-line" href={emailHref}>
+            {settings.email}
+          </a>
+        </dd>
+      </div>
+      <div>
+        <dt class="section-label">{t('home.contact.phone')}</dt>
+        <dd>
+          <a class="link-line" href={phoneHref}>
+            {settings.telefone}
+          </a>
+        </dd>
+      </div>
+    </dl>
+    <div class="contact-action" data-reveal>
+      <Button href={localizePath('/contato', lang)} arrow>
+        {t('nav.contact')}
+      </Button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact-band {
+    border-top: var(--line-width) solid var(--color-line);
+  }
+
+  .contact-title {
+    margin: 0;
+    font-size: var(--text-hero);
+    font-weight: var(--weight-light);
+    line-height: var(--leading-tight);
+    letter-spacing: -0.02em;
+  }
+
+  .contact-channels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md) var(--space-xl);
+    margin: 0;
+  }
+
+  .contact-channels dd {
+    margin: var(--space-xs) 0 0;
+    color: var(--color-white);
+    font-size: var(--text-lead);
+    font-weight: var(--weight-light);
+  }
+
+  @media (min-width: 1024px) {
+    .contact-action {
+      grid-column: 11 / -1 !important;
+      justify-self: end;
+      align-self: end;
+    }
+  }
+</style>

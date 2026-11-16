@@ -54,6 +54,11 @@ export const motionConfig = {
     parallax: 8,
   },
 
+  /** Números da Trajetória: contagem progressiva */
+  counters: {
+    duration: 1.2,
+  },
+
   /** Imagens editoriais: deslocamento máximo em % */
   parallax: {
     amount: 8,

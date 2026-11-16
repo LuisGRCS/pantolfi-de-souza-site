@@ -1,0 +1,226 @@
+---
+/**
+ * Linha do tempo vertical com filtro por tipo de marco.
+ * O filtro funciona sem recarregar a página; sem JavaScript, todos os marcos aparecem.
+ * A linha que se desenha com a rolagem fica em src/motion/timeline.ts.
+ */
+import type { CollectionEntry } from 'astro:content';
+import Placeholder from '@/components/ui/Placeholder.astro';
+import { timelineTypes } from '@/content.config';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+
+interface Props {
+  items: CollectionEntry<'trajetoria'>[];
+}
+
+const { items } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
+const usedTypes = timelineTypes.filter((type) => items.some((item) => item.data.tipo === type));
+---
+
+<div class="timeline" data-timeline>
+  <div
+    class="timeline-filter"
+    role="group"
+    aria-label={t('career.filter')}
+    data-timeline-filter
+    hidden
+  >
+    <button type="button" aria-pressed="true" data-type="todos">
+      {t('career.all')}
+    </button>
+    {usedTypes.map((type) => (
+      <button type="button" aria-pressed="false" data-type={type}>
+        {t(`career.type.${type}`)}
+      </button>
+    ))}
+  </div>
+
+  <div class="timeline-track">
+    <span class="timeline-line" aria-hidden="true">
+      <span data-timeline-line></span>
+    </span>
+    <ol class="timeline-list">
+      {items.map((item) => (
+        <li class="timeline-item" data-type={item.data.tipo} data-timeline-item data-reveal>
+          <span class="timeline-dot" aria-hidden="true" />
+          <p class="timeline-meta">
+            <span class="index-num">
+              <Placeholder value={item.data.periodo} />
+            </span>
+            <span class="timeline-type">{t(`career.type.${item.data.tipo}`)}</span>
+          </p>
+          <h3 class="timeline-role" data-reveal-skip>
+            <Placeholder value={item.data.cargo} />
+          </h3>
+          <p class="timeline-place">
+            <Placeholder value={item.data.instituicao} />
+          </p>
+          {item.data.descricao && (
+            <p class="timeline-text">
+              <Placeholder value={item.data.descricao} />
+            </p>
+          )}
+        </li>
+      ))}
+    </ol>
+    <p class="timeline-empty" data-timeline-empty hidden>
+      {t('career.empty')}
+    </p>
+  </div>
+</div>
+
+<script>
+  // Filtro por tipo de marco (sem recarregar a página).
+  function initTimelineFilter() {
+    const root = document.querySelector<HTMLElement>('[data-timeline]');
+    const filter = root?.querySelector<HTMLElement>('[data-timeline-filter]');
+    if (!root || !filter) return;
+    filter.hidden = false;
+    const buttons = [...filter.querySelectorAll<HTMLButtonElement>('button')];
+    const items = [...root.querySelectorAll<HTMLElement>('[data-timeline-item]')];
+    const empty = root.querySelector<HTMLElement>('[data-timeline-empty]');
+
+    buttons.forEach((button) =>
+      button.addEventListener('click', () => {
+        const type = button.dataset['type'];
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+        let visible = 0;
+        items.forEach((item) => {
+          const show = type === 'todos' || item.dataset['type'] === type;
+          item.hidden = !show;
+          if (show) visible += 1;
+        });
+        if (empty) empty.hidden = visible > 0;
+        root.dispatchEvent(new CustomEvent('timeline:filter', { bubbles: true }));
+      }),
+    );
+  }
+
+  document.addEventListener('astro:page-load', initTimelineFilter);
+</script>
+
+<style>
+  .timeline-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-xl);
+  }
+
+  .timeline-filter[hidden] {
+    display: none;
+  }
+
+  .timeline-filter button {
+    min-height: 40px;
+    padding-inline: var(--space-sm);
+    color: var(--color-ink);
+    background: none;
+    border: var(--line-width) solid var(--color-line-ink);
+    font: inherit;
+    font-size: var(--text-small);
+    cursor: pointer;
+    transition:
+      border-color var(--duration-fast) var(--ease-out),
+      background-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
+  }
+
+  .timeline-filter button:hover {
+    border-color: var(--color-gold-text);
+  }
+
+  .timeline-filter button[aria-pressed='true'] {
+    color: var(--color-paper);
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+  }
+
+  .timeline-track {
+    position: relative;
+    padding-left: clamp(2rem, 5vw, 4rem);
+  }
+
+  .timeline-line {
+    position: absolute;
+    top: 0.6rem;
+    bottom: 0;
+    left: 0;
+    width: var(--line-width);
+    background: var(--color-line-ink);
+  }
+
+  .timeline-line span {
+    position: absolute;
+    inset: 0;
+    background: var(--color-gold-text);
+    transform-origin: top;
+  }
+
+  .timeline-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .timeline-item {
+    position: relative;
+  }
+
+  .timeline-item[hidden] {
+    display: none;
+  }
+
+  .timeline-dot {
+    position: absolute;
+    top: 0.45rem;
+    left: calc(clamp(2rem, 5vw, 4rem) * -1 - 4px);
+    width: 9px;
+    height: 9px;
+    background: var(--color-paper);
+    border: var(--line-width) solid var(--color-gold-text);
+    transition: background-color var(--duration-base) var(--ease-out);
+  }
+
+  .timeline-item:global([data-active]) .timeline-dot,
+  :global(html:not(.motion-ok)) .timeline-dot {
+    background: var(--color-gold-text);
+  }
+
+  .timeline-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-md);
+    margin: 0 0 var(--space-xs);
+    font-size: var(--text-small);
+  }
+
+  .timeline-type {
+    color: var(--color-ink);
+    opacity: 0.8;
+  }
+
+  .timeline-role {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: var(--text-h3);
+    font-weight: var(--weight-light);
+    line-height: 1.3;
+    max-width: 32ch;
+  }
+
+  .timeline-place {
+    margin: 0.25rem 0 0;
+    font-weight: var(--weight-bold);
+    font-size: var(--text-small);
+    letter-spacing: 0.02em;
+  }
+
+  .timeline-text {
+    max-width: 60ch;
+    margin: var(--space-sm) 0 0;
+  }
+</style>

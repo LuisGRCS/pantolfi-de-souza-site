@@ -1,0 +1,58 @@
+---
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+
+interface Props {
+  items: { label: string; href?: string }[];
+}
+
+const { items } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+<nav aria-label={t('areas.breadcrumb')} class="breadcrumb">
+  <ol>
+    {items.map((item) => (
+      <li>
+        {item.href ? (
+          <a class="link-line" href={item.href}>
+            {item.label}
+          </a>
+        ) : (
+          <span aria-current="page">{item.label}</span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<style>
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    color: var(--color-muted);
+    font-size: var(--text-small);
+  }
+
+  li + li::before {
+    content: '/';
+    margin-right: 0.5rem;
+    color: var(--color-gold);
+  }
+
+  a {
+    color: var(--color-silver);
+  }
+
+  [aria-current] {
+    display: inline-block;
+    max-width: 40ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: bottom;
+  }
+</style>

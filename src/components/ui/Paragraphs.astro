@@ -1,0 +1,19 @@
+---
+/** Texto com parágrafos separados por linha em branco; marcadores [PREENCHER] ficam destacados. */
+import { toParagraphs } from '@/lib/content';
+import Placeholder from './Placeholder.astro';
+
+interface Props {
+  text: string;
+  class?: string;
+  reveal?: boolean;
+}
+
+const { text, class: className, reveal = false } = Astro.props;
+---
+
+{toParagraphs(text).map((paragraph) => (
+  <p class={className} data-reveal={reveal ? '' : undefined}>
+    <Placeholder value={paragraph} />
+  </p>
+))}

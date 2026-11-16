@@ -11,6 +11,8 @@ import { isDesktop } from './env';
  *   - [data-reveal-group]  revela os filhos [data-reveal] em sequência
  *   - [data-hero-media]    fundo do hero: zoom de entrada e parallax
  *   - [data-parallax]      imagem editorial com parallax (só desktop)
+ *   - [data-draw-line]     divisor (.rule-top) que se desenha da esquerda
+ *   - [data-count-to]      número que conta de 0 até o valor (só números permitidos)
  * Cada elemento revela uma única vez.
  */
 
@@ -65,9 +67,9 @@ function revealBlocks(scope: ParentNode, delay: number): void {
     if (items.length === 0) return;
     gsap.fromTo(
       items,
-      { autoAlpha: 0, y: blocks.distance },
+      { opacity: 0, y: blocks.distance },
       {
-        autoAlpha: 1,
+        opacity: 1,
         y: 0,
         duration: blocks.duration,
         ease,
@@ -81,9 +83,9 @@ function revealBlocks(scope: ParentNode, delay: number): void {
     if (grouped.has(item)) return;
     gsap.fromTo(
       item,
-      { autoAlpha: 0, y: blocks.distance },
+      { opacity: 0, y: blocks.distance },
       {
-        autoAlpha: 1,
+        opacity: 1,
         y: 0,
         duration: blocks.duration,
         ease,
@@ -134,6 +136,35 @@ function parallaxImages(scope: ParentNode): void {
   });
 }
 
+function drawLines(scope: ParentNode): void {
+  scope.querySelectorAll<HTMLElement>('[data-draw-line]').forEach((element) => {
+    ScrollTrigger.create({
+      trigger: element,
+      start: blocks.start,
+      once: true,
+      onEnter: () => element.setAttribute('data-drawn', ''),
+    });
+  });
+}
+
+function countUp(scope: ParentNode): void {
+  scope.querySelectorAll<HTMLElement>('[data-count-to]').forEach((element) => {
+    const target = Number(element.dataset['countTo']);
+    if (!Number.isFinite(target)) return;
+    const counter = { value: 0 };
+    element.textContent = '0';
+    gsap.to(counter, {
+      value: target,
+      duration: motionConfig.counters.duration,
+      ease: motionConfig.easeSoft,
+      onUpdate: () => {
+        element.textContent = String(Math.round(counter.value));
+      },
+      scrollTrigger: { trigger: element, start: blocks.start, once: true },
+    });
+  });
+}
+
 /** Liga todos os reveals da página. Retorna uma função que desfaz tudo (troca de página). */
 export function initReveals(scope: ParentNode = document, options: RevealOptions = {}): () => void {
   const delay = options.delay ?? 0;
@@ -141,6 +172,8 @@ export function initReveals(scope: ParentNode = document, options: RevealOptions
     animateHero(scope, delay);
     revealBlocks(scope, delay);
     parallaxImages(scope);
+    drawLines(scope);
+    countUp(scope);
   });
   const splits = revealHeadings(scope, delay);
   document.documentElement.setAttribute('data-motion-ready', '');
