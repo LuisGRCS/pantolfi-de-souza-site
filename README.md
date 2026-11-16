@@ -32,3 +32,8 @@ O site abre em `http://localhost:4321`.
 | `public/marca/`                  | Logotipos oficiais                                    |
 
 Textos ainda pendentes aparecem no site contornados e com a marcação `[PREENCHER: …]`.
+
+## Chaves do formulário de contato
+
+O formulário usa o Resend (envio de e-mail) e o Cloudflare Turnstile (proteção contra spam).
+As chaves ficam nas variáveis de ambiente da Vercel, nunca no código. A lista está em `.env.example`.

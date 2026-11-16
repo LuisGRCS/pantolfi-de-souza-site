@@ -24,7 +24,11 @@ const nextLinks = [
 ];
 ---
 
-<BaseLayout title={about.seo?.titulo ?? about.titulo} description={description}>
+<BaseLayout
+  searchGroup={t('nav.about')}
+  title={about.seo?.titulo ?? about.titulo}
+  description={description}
+>
   <!-- Abertura: retrato grande e título editorial -->
   <section class="about-hero" data-section aria-labelledby="page-title">
     <div class="container-site grid-12 about-hero-grid">

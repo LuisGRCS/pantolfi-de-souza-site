@@ -54,6 +54,7 @@ const description = isPlaceholder(seoDescription) ? title : seoDescription;
 ---
 
 <BaseLayout
+  searchGroup={t('nav.publications')}
   title={data.seo?.titulo ?? title}
   description={description}
   image={shareImage}
@@ -70,7 +71,7 @@ const description = isPlaceholder(seoDescription) ? title : seoDescription;
             { label: title },
           ]}
         />
-        <p class="article-meta">
+        <p class="article-meta" data-pagefind-ignore>
           <span class="index-num">{t(typeKey(data.tipo))}</span>
           <time datetime={isoDate(data.data)}>{formatDate(data.data)}</time>
           {hasBody && (
@@ -95,7 +96,7 @@ const description = isPlaceholder(seoDescription) ? title : seoDescription;
 
       <div class="article-main">
         {(eventType || data.veiculo || data.linkExterno || data.pdf || data.video) && (
-          <div class="article-facts rule-top">
+          <div class="article-facts rule-top" data-pagefind-ignore>
             <dl>
               {eventType && (
                 <div>
@@ -143,7 +144,12 @@ const description = isPlaceholder(seoDescription) ? title : seoDescription;
   </article>
 
   {related.length > 0 && (
-    <section class="section related" data-section aria-labelledby="related-title">
+    <section
+      class="section related"
+      data-section
+      data-pagefind-ignore
+      aria-labelledby="related-title"
+    >
       <div class="container-site grid-12">
         <h2 id="related-title" class="section-label col-label">
           {t('pub.related')}

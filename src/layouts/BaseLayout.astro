@@ -19,9 +19,19 @@ interface Props {
   noindex?: boolean;
   image?: string | undefined;
   type?: 'website' | 'article' | undefined;
+  /** grupo nos resultados da busca; páginas sem grupo não entram na busca */
+  searchGroup?: string | undefined;
 }
 
-const { title, description, overlayHeader = false, noindex = false, image, type } = Astro.props;
+const {
+  title,
+  description,
+  overlayHeader = false,
+  noindex = false,
+  image,
+  type,
+  searchGroup,
+} = Astro.props;
 const lang = getLangFromUrl(Astro.url);
 ---
 
@@ -58,7 +68,13 @@ const lang = getLangFromUrl(Astro.url);
     </div>
     <SkipLink />
     <Header overlay={overlayHeader} />
-    <main id="conteudo" tabindex="-1" class:list={{ 'offset-header': !overlayHeader }}>
+    <main
+      id="conteudo"
+      tabindex="-1"
+      class:list={{ 'offset-header': !overlayHeader }}
+      data-pagefind-body={searchGroup ? '' : undefined}
+    >
+      {searchGroup && <meta data-pagefind-filter="grupo[content]" content={searchGroup} />}
       <slot />
     </main>
     <Footer />

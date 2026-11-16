@@ -35,7 +35,11 @@ const description =
     : `${plainTitle}: área de atuação de ${settings.nome}.`;
 ---
 
-<BaseLayout title={data.seo?.titulo ?? plainTitle} description={description}>
+<BaseLayout
+  searchGroup={t('nav.areas')}
+  title={data.seo?.titulo ?? plainTitle}
+  description={description}
+>
   <PageHeader title={data.titulo} lead={data.resumo} index={areaIndex(position)}>
     <Breadcrumb
       slot="before"
@@ -114,7 +118,7 @@ const description =
   )}
 
   {areaPublications.length > 0 && (
-    <section class="section" data-section aria-labelledby="area-pubs-title">
+    <section class="section" data-section aria-labelledby="area-pubs-title" data-pagefind-ignore>
       <div class="container-site grid-12">
         <h2 id="area-pubs-title" class="section-label col-label">
           {t('areas.publications')}
@@ -131,7 +135,7 @@ const description =
   )}
 
   {next.id !== area.id && (
-    <nav class="next-area" aria-label={t('areas.next')}>
+    <nav class="next-area" data-pagefind-ignore aria-label={t('areas.next')}>
       <a
         href={localizePath(`/areas/${next.id}`, lang)}
         class="container-site next-area-link rule-top"

@@ -21,7 +21,11 @@ const stats = [
 ];
 ---
 
-<BaseLayout title={t('nav.career')} description={`Trajetória profissional de ${settings.nome}.`}>
+<BaseLayout
+  searchGroup={t('nav.career')}
+  title={t('nav.career')}
+  description={`Trajetória profissional de ${settings.nome}.`}
+>
   <PageHeader title={t('nav.career')} lead={t('career.lead')} />
 
   <section

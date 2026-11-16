@@ -1,0 +1,23 @@
+---
+/** Resultado do envio quando o navegador está sem JavaScript. */
+import PageHeader from '@/components/sections/PageHeader.astro';
+import LinkArrow from '@/components/ui/LinkArrow.astro';
+import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<BaseLayout title={t('contact.error.title')} description={t('contact.error.page')} noindex>
+  <PageHeader title={t('contact.error.title')} lead={t('contact.error.page')} />
+  <div class="container-site back">
+    <LinkArrow href={localizePath('/contato', lang)}>{t('nav.contact')}</LinkArrow>
+  </div>
+</BaseLayout>
+
+<style>
+  .back {
+    padding-bottom: var(--space-section);
+  }
+</style>

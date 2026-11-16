@@ -15,7 +15,7 @@ const clean = (text: string) => text.replace(/^\[PREENCHER:\s*(.*)\]$/, '[PREENC
 ---
 
 {headings.length > 1 && (
-  <nav class="toc" aria-labelledby="toc-title" data-toc>
+  <nav class="toc" aria-labelledby="toc-title" data-toc data-pagefind-ignore>
     <details class="toc-details" open data-toc-details>
       <summary id="toc-title" class="section-label">
         {t('pub.toc')}

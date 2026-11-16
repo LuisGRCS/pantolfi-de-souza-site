@@ -12,7 +12,7 @@ interface Props {
 const { items } = Astro.props;
 ---
 
-<dl class="stats" data-reveal-group>
+<dl class="stats" data-reveal-group data-pagefind-ignore>
   {items.map((item) => (
     <div class="stat rule-top" data-reveal>
       <dt class="stat-label">{item.label}</dt>

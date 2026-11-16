@@ -1,0 +1,434 @@
+---
+/**
+ * Formulário de contato. Sem JavaScript, envia normalmente e volta para esta página
+ * com o resultado. Com JavaScript, valida antes de enviar, mostra os erros ao lado de
+ * cada campo e envia sem recarregar a página.
+ */
+import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
+import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const messages = {
+  required: t('field.required'),
+  email: t('field.email'),
+  short: t('field.short'),
+  consent: t('field.consent'),
+  sending: t('contact.sending'),
+  submit: t('contact.submit'),
+  sentTitle: t('contact.sent.title'),
+  sentText: t('contact.sent.text'),
+  errorTitle: t('contact.error.title'),
+  fields: t('contact.error.fields'),
+  server: t('contact.error.server'),
+  limit: t('contact.error.limit'),
+  captcha: t('contact.error.captcha'),
+};
+
+const fields = [
+  { name: 'nome', label: t('contact.name'), type: 'text', autocomplete: 'name', required: true },
+  {
+    name: 'email',
+    label: t('contact.email'),
+    type: 'email',
+    autocomplete: 'email',
+    required: true,
+  },
+  {
+    name: 'telefone',
+    label: t('contact.phone'),
+    type: 'tel',
+    autocomplete: 'tel',
+    required: false,
+  },
+  {
+    name: 'assunto',
+    label: t('contact.subject'),
+    type: 'text',
+    autocomplete: 'off',
+    required: true,
+  },
+] as const;
+---
+
+<form
+  id="formulario"
+  class="contact-form"
+  action="/api/contato"
+  method="post"
+  novalidate
+  data-contact-form
+  data-messages={JSON.stringify(messages)}
+>
+  <div class="form-status" role="status" aria-live="polite" tabindex="-1" data-form-status></div>
+
+  <div class="form-grid">
+    {fields.map((field) => (
+      <div class="field" data-field={field.name}>
+        <label for={`campo-${field.name}`}>
+          {field.label}
+          {!field.required && <span class="optional"> ({t('contact.optional')})</span>}
+        </label>
+        <input
+          id={`campo-${field.name}`}
+          name={field.name}
+          type={field.type}
+          autocomplete={field.autocomplete}
+          required={field.required}
+          aria-describedby={`erro-${field.name}`}
+          maxlength={field.name === 'assunto' ? 160 : 200}
+        />
+        <p class="field-error" id={`erro-${field.name}`} data-error-for={field.name} />
+      </div>
+    ))}
+
+    <div class="field field--wide" data-field="mensagem">
+      <label for="campo-mensagem">{t('contact.message')}</label>
+      <textarea
+        id="campo-mensagem"
+        name="mensagem"
+        rows="7"
+        required
+        minlength="10"
+        maxlength="5000"
+        aria-describedby="erro-mensagem"
+      ></textarea>
+      <p class="field-error" id="erro-mensagem" data-error-for="mensagem"></p>
+    </div>
+  </div>
+
+  <!-- Campo invisível contra robôs (pessoas não veem nem preenchem) -->
+  <div class="trap" aria-hidden="true">
+    <label for="campo-empresa-site">Site da empresa</label>
+    <input
+      id="campo-empresa-site"
+      name="empresa_site"
+      type="text"
+      tabindex="-1"
+      autocomplete="off"
+    />
+  </div>
+
+  <div class="field consent" data-field="consentimento">
+    <label class="checkbox">
+      <input
+        type="checkbox"
+        name="consentimento"
+        value="sim"
+        required
+        aria-describedby="erro-consentimento"
+      />
+      <span>
+        {t('contact.consent.before')}
+        <a class="link-line" href={localizePath('/privacidade', lang)} target="_blank">
+          {t('contact.consent.link')}
+        </a>
+        {t('contact.consent.after')}
+      </span>
+    </label>
+    <p class="field-error" id="erro-consentimento" data-error-for="consentimento"></p>
+  </div>
+
+  {PUBLIC_TURNSTILE_SITE_KEY && (
+    <div
+      class="cf-turnstile"
+      data-sitekey={PUBLIC_TURNSTILE_SITE_KEY}
+      data-language="pt-br"
+      data-theme="dark"
+    />
+  )}
+
+  <div class="form-actions">
+    <button type="submit" class="submit" data-submit>
+      {t('contact.submit')}
+    </button>
+    <p class="notice">{t('contact.notice')}</p>
+  </div>
+</form>
+
+{PUBLIC_TURNSTILE_SITE_KEY && (
+  <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+)}
+
+<script>
+  type Messages = Record<string, string>;
+
+  function initContactForm() {
+    const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+    if (!form) return;
+    const messages = JSON.parse(form.dataset['messages'] ?? '{}') as Messages;
+    const status = form.querySelector<HTMLElement>('[data-form-status]');
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]');
+
+    const setError = (name: string, message: string) => {
+      const control = form.elements.namedItem(name) as HTMLInputElement | null;
+      const slot = form.querySelector<HTMLElement>(`[data-error-for="${name}"]`);
+      if (slot) slot.textContent = message;
+      control?.setAttribute('aria-invalid', message ? 'true' : 'false');
+    };
+
+    const check = (control: HTMLInputElement | HTMLTextAreaElement): string => {
+      const { validity } = control;
+      if (control.name === 'consentimento')
+        return validity.valueMissing ? (messages['consent'] ?? '') : '';
+      if (validity.valueMissing) return messages['required'] ?? '';
+      if (validity.typeMismatch) return messages['email'] ?? '';
+      if (validity.tooShort) return messages['short'] ?? '';
+      return '';
+    };
+
+    const controls = [
+      ...form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
+        'input[name], textarea[name]',
+      ),
+    ].filter(
+      (control) => control.name !== 'empresa_site' && control.name !== 'cf-turnstile-response',
+    );
+
+    // Revalida enquanto a pessoa corrige o campo (e não ao sair dele: apagar o erro
+    // no momento do clique em outro campo faria a página "pular" sob o cursor).
+    controls.forEach((control) => {
+      const revalidate = () => {
+        if (control.getAttribute('aria-invalid') === 'true') setError(control.name, check(control));
+      };
+      control.addEventListener('input', revalidate);
+      control.addEventListener('change', revalidate);
+    });
+
+    const showStatus = (kind: 'ok' | 'error', title: string, text: string) => {
+      if (!status) return;
+      status.innerHTML = '';
+      const p = document.createElement('p');
+      p.className = kind === 'ok' ? 'status-ok' : 'status-error';
+      const strong = document.createElement('strong');
+      strong.textContent = title;
+      p.append(strong, ` ${text}`);
+      status.append(p);
+      status.focus();
+    };
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      let firstInvalid: HTMLElement | null = null;
+      controls.forEach((control) => {
+        const message = check(control);
+        setError(control.name, message);
+        if (message && !firstInvalid) firstInvalid = control;
+      });
+      if (firstInvalid) {
+        (firstInvalid as HTMLElement).focus();
+        return;
+      }
+
+      if (submit) {
+        submit.disabled = true;
+        submit.textContent = messages['sending'] ?? '';
+      }
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { Accept: 'application/json' },
+        });
+        const result = (await response.json()) as {
+          ok: boolean;
+          reason?: string;
+          errors?: Record<string, string>;
+        };
+        if (result.ok) {
+          form.reset();
+          showStatus('ok', messages['sentTitle'] ?? '', messages['sentText'] ?? '');
+        } else {
+          if (result.errors) {
+            Object.entries(result.errors).forEach(([name, key]) =>
+              setError(name, messages[key.replace('field.', '')] ?? messages['required'] ?? ''),
+            );
+          }
+          showStatus(
+            'error',
+            messages['errorTitle'] ?? '',
+            messages[result.reason ?? 'server'] ?? '',
+          );
+        }
+      } catch {
+        showStatus('error', messages['errorTitle'] ?? '', messages['server'] ?? '');
+      } finally {
+        if (submit) {
+          submit.disabled = false;
+          submit.textContent = messages['submit'] ?? '';
+        }
+        (window as unknown as { turnstile?: { reset: () => void } }).turnstile?.reset();
+      }
+    });
+  }
+
+  document.addEventListener('astro:page-load', initContactForm);
+</script>
+
+<style>
+  .contact-form {
+    display: grid;
+    gap: var(--space-lg);
+  }
+
+  .form-status:empty {
+    display: none;
+  }
+
+  .form-status:focus {
+    outline: none;
+  }
+
+  .form-status :global(p) {
+    margin: 0;
+    padding: var(--space-md);
+    border-left: var(--line-width) solid currentColor;
+  }
+
+  .form-status :global(.status-ok) {
+    color: var(--color-white);
+    border-color: var(--color-gold);
+    background: color-mix(in srgb, var(--color-gold) 10%, transparent);
+  }
+
+  .form-status :global(.status-error) {
+    color: var(--color-white);
+    border-color: #e4a39a;
+    background: rgba(228, 163, 154, 0.08);
+  }
+
+  .form-grid {
+    display: grid;
+    gap: var(--space-lg) var(--grid-gap);
+  }
+
+  @media (min-width: 768px) {
+    .form-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .field--wide {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .field {
+    display: grid;
+    gap: var(--space-xs);
+  }
+
+  label {
+    color: var(--color-white);
+    font-size: var(--text-small);
+  }
+
+  .optional {
+    color: var(--color-muted);
+  }
+
+  input:not([type='checkbox']),
+  textarea {
+    width: 100%;
+    padding: 0.75rem 0;
+    color: var(--color-white);
+    background: transparent;
+    border: 0;
+    border-bottom: var(--line-width) solid var(--color-silver);
+    border-radius: 0;
+    font: inherit;
+    font-size: var(--text-body);
+    transition: border-color var(--duration-fast) var(--ease-out);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 10rem;
+    padding: 0.75rem;
+    border: var(--line-width) solid var(--color-silver);
+  }
+
+  input:not([type='checkbox']):focus,
+  textarea:focus {
+    border-color: var(--color-gold);
+    outline: var(--line-width) solid var(--color-gold);
+    outline-offset: 2px;
+  }
+
+  [aria-invalid='true'] {
+    border-color: #e4a39a !important;
+  }
+
+  .field-error {
+    min-height: 1.25em;
+    margin: 0;
+    color: #e4a39a;
+    font-size: var(--text-small);
+  }
+
+  .field-error:empty {
+    min-height: 0;
+  }
+
+  .checkbox {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    gap: var(--space-sm);
+    color: var(--color-silver);
+    line-height: 1.5;
+    cursor: pointer;
+  }
+
+  .checkbox input {
+    width: 20px;
+    height: 20px;
+    margin: 0.15em 0 0;
+    accent-color: var(--color-gold);
+  }
+
+  .trap {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .form-actions {
+    display: grid;
+    gap: var(--space-sm);
+    justify-items: start;
+  }
+
+  .submit {
+    min-height: 52px;
+    padding-inline: var(--space-lg);
+    color: var(--color-white);
+    background: none;
+    border: var(--line-width) solid var(--color-gold);
+    font: inherit;
+    font-size: var(--text-small);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      background-color var(--duration-fast) var(--ease-out);
+  }
+
+  .submit:hover:not(:disabled) {
+    color: var(--color-primary);
+    background: var(--color-gold);
+  }
+
+  .submit:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+
+  .notice {
+    max-width: 56ch;
+    margin: 0;
+    color: var(--color-muted);
+    font-size: var(--text-small);
+  }
+</style>

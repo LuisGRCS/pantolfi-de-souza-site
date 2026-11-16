@@ -3,9 +3,24 @@ import Icon from '@/components/ui/Icon.astro';
 import { getLangFromUrl, useTranslations } from '@/i18n/utils';
 
 const t = useTranslations(getLangFromUrl(Astro.url));
+const groupOrder = [t('nav.areas'), t('nav.publications'), t('nav.career'), t('nav.about')];
+const texts = {
+  loading: t('search.loading'),
+  empty: t('search.empty'),
+  unavailable: t('search.unavailable'),
+  results: t('search.results'),
+};
 ---
 
-<dialog id="site-search" class="search" aria-labelledby="search-title" data-search>
+<dialog
+  id="site-search"
+  class="search"
+  aria-labelledby="search-title"
+  data-search
+  data-lenis-prevent
+  data-groups={JSON.stringify(groupOrder)}
+  data-texts={JSON.stringify(texts)}
+>
   <div class="search-inner">
     <div class="search-top">
       <h2 id="search-title" class="caps search-title">
@@ -28,13 +43,129 @@ const t = useTranslations(getLangFromUrl(Astro.url));
         autocomplete="off"
         spellcheck="false"
         placeholder={t('search.placeholder')}
+        aria-describedby="search-hint"
         data-search-input
       />
     </form>
-    <p class="search-hint">{t('search.hint')}</p>
+    <p class="search-hint" id="search-hint" data-search-hint>
+      {t('search.hint')}
+    </p>
     <div class="search-results" aria-live="polite" data-search-results></div>
   </div>
 </dialog>
+
+<script>
+  /**
+   * Busca estática (Pagefind): o índice é gerado na publicação do site e
+   * carregado só quando a pessoa abre a busca pela primeira vez.
+   */
+  interface PagefindResult {
+    url: string;
+    excerpt: string;
+    meta: { title?: string };
+    filters: Record<string, string[]>;
+  }
+  interface Pagefind {
+    options: (opts: Record<string, unknown>) => Promise<void>;
+    debouncedSearch: (
+      term: string,
+      opts?: object,
+      ms?: number,
+    ) => Promise<{ results: { data: () => Promise<PagefindResult>; id: string }[] } | null>;
+  }
+
+  let pagefind: Promise<Pagefind | null> | null = null;
+  const loadPagefind = () =>
+    (pagefind ??= import(/* @vite-ignore */ `${'/pagefind/'}pagefind.js`)
+      .then(async (module: Pagefind) => {
+        await module.options({ excerptLength: 24 });
+        return module;
+      })
+      .catch(() => null));
+
+  const cleanUrl = (url: string) => url.replace(/\/index\.html$/, '').replace(/(.)\/$/, '$1');
+
+  function initSearch() {
+    const dialog = document.querySelector<HTMLDialogElement>('[data-search]');
+    const input = dialog?.querySelector<HTMLInputElement>('[data-search-input]');
+    const output = dialog?.querySelector<HTMLElement>('[data-search-results]');
+    const hint = dialog?.querySelector<HTMLElement>('[data-search-hint]');
+    if (!dialog || !input || !output) return;
+    const groups = JSON.parse(dialog.dataset['groups'] ?? '[]') as string[];
+    const texts = JSON.parse(dialog.dataset['texts'] ?? '{}') as Record<string, string>;
+
+    const message = (text: string) => {
+      output.innerHTML = '';
+      const p = document.createElement('p');
+      p.className = 'search-message';
+      p.textContent = text;
+      output.append(p);
+    };
+
+    dialog.addEventListener('toggle', () => {
+      if (dialog.open) void loadPagefind();
+    });
+    dialog.querySelector('form')?.addEventListener('submit', (event) => event.preventDefault());
+
+    input.addEventListener('input', async () => {
+      const term = input.value.trim();
+      if (hint) hint.hidden = term.length > 0;
+      if (term.length < 2) {
+        output.innerHTML = '';
+        return;
+      }
+      const engine = await loadPagefind();
+      if (!engine) return message(texts['unavailable'] ?? '');
+      const search = await engine.debouncedSearch(term, {}, 250);
+      if (!search) return; // substituída por uma busca mais recente
+      if (search.results.length === 0) return message(texts['empty'] ?? '');
+
+      const items = await Promise.all(search.results.slice(0, 20).map((result) => result.data()));
+      const byGroup = new Map<string, PagefindResult[]>();
+      items.forEach((item) => {
+        const group = item.filters['grupo']?.[0] ?? '';
+        byGroup.set(group, [...(byGroup.get(group) ?? []), item]);
+      });
+
+      output.innerHTML = '';
+      const count = document.createElement('p');
+      count.className = 'search-count';
+      count.textContent = `${search.results.length} ${texts['results'] ?? ''}`;
+      output.append(count);
+
+      [...byGroup.keys()]
+        .sort((a, b) => groups.indexOf(a) - groups.indexOf(b))
+        .forEach((group) => {
+          const section = document.createElement('section');
+          section.className = 'search-group';
+          const heading = document.createElement('h3');
+          heading.className = 'search-group-title';
+          heading.textContent = group;
+          const list = document.createElement('ul');
+          (byGroup.get(group) ?? []).forEach((item) => {
+            const li = document.createElement('li');
+            const link = document.createElement('a');
+            link.href = cleanUrl(item.url);
+            link.className = 'search-result';
+            const title = document.createElement('span');
+            title.className = 'search-result-title';
+            title.textContent = item.meta.title ?? item.url;
+            const excerpt = document.createElement('span');
+            excerpt.className = 'search-result-excerpt';
+            excerpt.innerHTML = item.excerpt; // trecho gerado pelo índice, com <mark>
+            link.append(title, excerpt);
+            link.addEventListener('click', () => dialog.close());
+            li.append(link);
+            list.append(li);
+          });
+          section.append(heading, list);
+          output.append(section);
+        });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initSearch);
+</script>
 
 <style>
   .search {
@@ -134,6 +265,10 @@ const t = useTranslations(getLangFromUrl(Astro.url));
     outline: none;
   }
 
+  .search-form input::-webkit-search-cancel-button {
+    appearance: none;
+  }
+
   .search-form input::placeholder {
     color: var(--color-muted);
   }
@@ -147,5 +282,71 @@ const t = useTranslations(getLangFromUrl(Astro.url));
     margin-top: var(--space-sm);
     color: var(--color-muted);
     font-size: var(--text-small);
+  }
+
+  .search-results {
+    margin-top: var(--space-lg);
+  }
+
+  .search-results :global(.search-count),
+  .search-results :global(.search-message) {
+    margin: 0 0 var(--space-md);
+    color: var(--color-muted);
+    font-size: var(--text-small);
+  }
+
+  .search-results :global(.search-message) {
+    color: var(--color-silver);
+    font-size: var(--text-lead);
+    font-weight: var(--weight-light);
+  }
+
+  .search-results :global(.search-group + .search-group) {
+    margin-top: var(--space-xl);
+  }
+
+  .search-results :global(.search-group-title) {
+    margin: 0 0 var(--space-xs);
+    color: var(--color-silver);
+    font-family: var(--font-display);
+    font-size: var(--text-label);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+  }
+
+  .search-results :global(ul) {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .search-results :global(.search-result) {
+    display: grid;
+    gap: 0.25rem;
+    padding-block: var(--space-sm);
+    border-top: var(--line-width) solid var(--color-line);
+  }
+
+  .search-results :global(.search-result-title) {
+    color: var(--color-white);
+    font-size: var(--text-h3);
+    font-weight: var(--weight-light);
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .search-results :global(.search-result:hover .search-result-title),
+  .search-results :global(.search-result:focus-visible .search-result-title) {
+    color: var(--color-gold);
+  }
+
+  .search-results :global(.search-result-excerpt) {
+    max-width: 72ch;
+    font-size: var(--text-small);
+  }
+
+  .search-results :global(mark) {
+    color: var(--color-white);
+    background: color-mix(in srgb, var(--color-gold) 35%, transparent);
   }
 </style>

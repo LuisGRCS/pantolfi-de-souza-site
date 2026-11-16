@@ -1,0 +1,49 @@
+---
+import ContactChannels from '@/components/sections/ContactChannels.astro';
+import ContactForm from '@/components/sections/ContactForm.astro';
+import PageHeader from '@/components/sections/PageHeader.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { settings } from '@/lib/site';
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+---
+
+<BaseLayout
+  title={t('nav.contact')}
+  description={`Contato com ${settings.nome}: formulário, e-mail, telefone e WhatsApp.`}
+>
+  <PageHeader title={t('nav.contact')} lead={t('contact.lead')} />
+  <section class="section contact-section" data-section aria-labelledby="form-title">
+    <div class="container-site grid-12">
+      <div class="contact-main">
+        <h2 id="form-title" class="section-label form-title">
+          {t('contact.form')}
+        </h2>
+        <ContactForm />
+      </div>
+      <aside class="contact-aside">
+        <ContactChannels />
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact-section {
+    padding-top: 0;
+  }
+
+  .form-title {
+    margin-bottom: var(--space-lg);
+  }
+
+  @media (min-width: 1024px) {
+    .grid-12 > .contact-main {
+      grid-column: 1 / span 7;
+    }
+    .grid-12 > .contact-aside {
+      grid-column: 9 / -1;
+    }
+  }
+</style>

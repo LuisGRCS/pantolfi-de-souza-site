@@ -1,0 +1,145 @@
+---
+/** Canais diretos de contato. O mapa só carrega ao clicar (sem cookies de terceiros antes disso). */
+import Placeholder from '@/components/ui/Placeholder.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import { emailHref, isPlaceholder, phoneHref, settings, whatsappHref } from '@/lib/site';
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+const hasAddress = !isPlaceholder(settings.endereco);
+const mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(settings.endereco)}&output=embed`;
+---
+
+<div class="channels">
+  <h2 class="section-label">{t('contact.channels')}</h2>
+  <dl>
+    <div class="rule-top">
+      <dt>{t('contact.email')}</dt>
+      <dd>
+        <a class="link-line" href={emailHref}>
+          {settings.email}
+        </a>
+      </dd>
+    </div>
+    <div class="rule-top">
+      <dt>{t('contact.phone')}</dt>
+      <dd>
+        <a class="link-line" href={phoneHref}>
+          {settings.telefone}
+        </a>
+      </dd>
+    </div>
+    <div class="rule-top">
+      <dt>{t('contact.whatsapp')}</dt>
+      <dd>
+        <a class="link-line" href={whatsappHref} target="_blank" rel="noopener">
+          {settings.telefone}
+        </a>
+      </dd>
+    </div>
+    <div class="rule-top">
+      <dt>{t('contact.address')}</dt>
+      <dd>
+        <Placeholder value={settings.endereco} />
+        <br />
+        {settings.cidade}
+      </dd>
+    </div>
+    <div class="rule-top">
+      <dt>{t('contact.hours')}</dt>
+      <dd>
+        <Placeholder value={settings.horario} />
+      </dd>
+    </div>
+  </dl>
+
+  {hasAddress && (
+    <div class="map" data-map>
+      <button
+        type="button"
+        class="map-button"
+        data-map-src={mapUrl}
+        data-map-title={settings.endereco}
+      >
+        {t('contact.map')}
+      </button>
+      <p class="map-note">{t('contact.map.note')}</p>
+    </div>
+  )}
+</div>
+
+<script>
+  function initMap() {
+    document.querySelectorAll<HTMLButtonElement>('[data-map-src]').forEach((button) =>
+      button.addEventListener('click', () => {
+        const frame = document.createElement('iframe');
+        frame.src = button.dataset['mapSrc'] ?? '';
+        frame.title = button.dataset['mapTitle'] ?? '';
+        frame.loading = 'lazy';
+        frame.referrerPolicy = 'no-referrer-when-downgrade';
+        frame.className = 'map-frame';
+        button.replaceWith(frame);
+      }),
+    );
+  }
+
+  document.addEventListener('astro:page-load', initMap);
+</script>
+
+<style>
+  .channels {
+    display: grid;
+    gap: var(--space-md);
+    align-content: start;
+  }
+
+  dl {
+    margin: 0;
+  }
+
+  dl > div {
+    display: grid;
+    gap: 0.15rem;
+    padding-block: var(--space-sm);
+  }
+
+  dt {
+    color: var(--color-muted);
+    font-size: var(--text-label);
+    letter-spacing: 0.06em;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--color-white);
+  }
+
+  .map-button,
+  .map :global(.map-frame) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border: var(--line-width) solid var(--color-line);
+  }
+
+  .map-button {
+    color: var(--color-white);
+    background:
+      linear-gradient(160deg, rgba(42, 49, 54, 0.9), var(--color-primary)), var(--color-primary);
+    font: inherit;
+    font-size: var(--text-small);
+    cursor: pointer;
+  }
+
+  .map-button:hover {
+    border-color: var(--color-gold);
+  }
+
+  .map :global(.map-frame) {
+    filter: grayscale(0.6) invert(0.9) hue-rotate(180deg);
+  }
+
+  .map-note {
+    margin: var(--space-xs) 0 0;
+    color: var(--color-muted);
+    font-size: var(--text-small);
+  }
+</style>

@@ -66,7 +66,7 @@ export default config({
     navigation: {
       Conteúdo: ['publicacoes', 'areas', 'trajetoria'],
       Páginas: ['inicio', 'sobre'],
-      Configurações: ['configuracoes'],
+      Configurações: ['configuracoes', 'privacidade', 'aviso-legal'],
     },
   },
 
@@ -200,6 +200,40 @@ export default config({
           itemLabel: (props) => props.value || 'Associação',
         }),
         seo,
+      },
+    }),
+
+    privacidade: singleton({
+      label: 'Política de Privacidade',
+      path: 'src/content/paginas/privacidade',
+      format: { contentField: 'corpo' },
+      entryLayout: 'content',
+      schema: {
+        titulo: fields.text({ label: 'Título', validation: { length: { min: 1 } } }),
+        atualizadoEm: fields.date({ label: 'Atualizado em', validation: { isRequired: true } }),
+        emRevisao: fields.checkbox({
+          label: 'Em revisão',
+          description:
+            'Mostra um aviso de rascunho no topo da página. Desmarque depois da revisão.',
+        }),
+        corpo: fields.markdoc({ label: 'Texto', extension: 'md' }),
+      },
+    }),
+
+    'aviso-legal': singleton({
+      label: 'Aviso Legal',
+      path: 'src/content/paginas/aviso-legal',
+      format: { contentField: 'corpo' },
+      entryLayout: 'content',
+      schema: {
+        titulo: fields.text({ label: 'Título', validation: { length: { min: 1 } } }),
+        atualizadoEm: fields.date({ label: 'Atualizado em', validation: { isRequired: true } }),
+        emRevisao: fields.checkbox({
+          label: 'Em revisão',
+          description:
+            'Mostra um aviso de rascunho no topo da página. Desmarque depois da revisão.',
+        }),
+        corpo: fields.markdoc({ label: 'Texto', extension: 'md' }),
       },
     }),
   },

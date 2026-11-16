@@ -152,4 +152,14 @@ const publicacoes = defineCollection({
       }),
 });
 
-export const collections = { areas, trajetoria, inicio, sobre, publicacoes };
+/** Páginas institucionais em texto: Política de Privacidade e Aviso Legal. */
+const legais = defineCollection({
+  loader: glob({ pattern: '{privacidade,aviso-legal}.md', base: './src/content/paginas' }),
+  schema: z.object({
+    titulo: z.string().min(1),
+    atualizadoEm: z.coerce.date(),
+    emRevisao: z.boolean().default(false),
+  }),
+});
+
+export const collections = { areas, trajetoria, inicio, sobre, publicacoes, legais };

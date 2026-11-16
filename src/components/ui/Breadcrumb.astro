@@ -9,7 +9,7 @@ const { items } = Astro.props;
 const t = useTranslations(getLangFromUrl(Astro.url));
 ---
 
-<nav aria-label={t('areas.breadcrumb')} class="breadcrumb">
+<nav aria-label={t('areas.breadcrumb')} class="breadcrumb" data-pagefind-ignore>
   <ol>
     {items.map((item) => (
       <li>
