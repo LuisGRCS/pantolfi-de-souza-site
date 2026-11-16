@@ -7,8 +7,10 @@ import Paragraphs from '@/components/ui/Paragraphs.astro';
 import Placeholder from '@/components/ui/Placeholder.astro';
 import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { areaIndex, getAreas } from '@/lib/content';
+import { areaIndex, getAreaNames, getAreas } from '@/lib/content';
 import { isPlaceholder, placeholderDisplay, settings } from '@/lib/site';
+import PublicationCard from '@/components/publications/PublicationCard.astro';
+import { byArea, getPublications } from '@/lib/publications';
 
 export const getStaticPaths = (async () => {
   const areas = await getAreas();
@@ -23,6 +25,8 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const { data } = area;
 const plainTitle = placeholderDisplay(data.titulo).text;
+const areaPublications = byArea(await getPublications(), area.id).slice(0, 3);
+const areaNames = await getAreaNames();
 
 const seoDescription = data.seo?.descricao;
 const description =
@@ -109,6 +113,23 @@ const description =
     </section>
   )}
 
+  {areaPublications.length > 0 && (
+    <section class="section" data-section aria-labelledby="area-pubs-title">
+      <div class="container-site grid-12">
+        <h2 id="area-pubs-title" class="section-label col-label">
+          {t('areas.publications')}
+        </h2>
+        <ul class="col-content area-pubs" data-reveal-group>
+          {areaPublications.map((publication) => (
+            <li data-reveal>
+              <PublicationCard publication={publication} areaNames={areaNames} />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
   {next.id !== area.id && (
     <nav class="next-area" aria-label={t('areas.next')}>
       <a
@@ -189,6 +210,20 @@ const description =
     padding-block: var(--space-sm);
     font-size: var(--text-lead);
     font-weight: var(--weight-light);
+  }
+
+  .area-pubs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-xl) var(--grid-gap);
+  }
+
+  @media (min-width: 768px) {
+    .area-pubs {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 
   .faq-note {

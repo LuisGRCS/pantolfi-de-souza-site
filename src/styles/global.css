@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import './tokens.css';
 @import './motion.css';
+@import './prose.css';
 @import '@fontsource/lato/latin-300.css';
 @import '@fontsource/lato/latin-400.css';
 @import '@fontsource/lato/latin-400-italic.css';

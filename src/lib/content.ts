@@ -1,5 +1,5 @@
 import { getCollection, getEntry } from 'astro:content';
-import { isPlaceholder, settings } from './site';
+import { isPlaceholder, placeholderDisplay, settings } from './site';
 
 /** Áreas publicadas, na ordem definida no conteúdo. */
 export async function getAreas() {
@@ -41,3 +41,11 @@ export const toParagraphs = (text: string): string[] =>
     .split(/\n\s*\n/)
     .map((paragraph) => paragraph.trim())
     .filter(Boolean);
+
+/** Nome de exibição de cada área (para etiquetas e filtros), indexado pelo endereço. */
+export async function getAreaNames(): Promise<Record<string, string>> {
+  const areas = await getAreas();
+  return Object.fromEntries(
+    areas.map((area) => [area.id, placeholderDisplay(area.data.titulo).text]),
+  );
+}

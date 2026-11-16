@@ -1,0 +1,89 @@
+---
+/** Caixa do autor ao fim de cada publicação. */
+import { Picture } from 'astro:assets';
+import LinkArrow from '@/components/ui/LinkArrow.astro';
+import Placeholder from '@/components/ui/Placeholder.astro';
+import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
+import { getHome } from '@/lib/content';
+import { settings } from '@/lib/site';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const { retrato, retratoAlt } = await getHome();
+---
+
+<aside class="author rule-top" aria-labelledby="author-name">
+  <div class="author-photo">
+    {retrato ? (
+      <Picture
+        src={retrato}
+        alt={retratoAlt ?? ''}
+        width={160}
+        height={200}
+        formats={['avif', 'webp']}
+      />
+    ) : (
+      <img
+        src="/marca/simbolo_dourado-fundo-escuro.svg"
+        width="40"
+        height="44"
+        alt=""
+        loading="lazy"
+      />
+    )}
+  </div>
+  <div class="author-text">
+    <p class="section-label">{t('pub.author')}</p>
+    <p id="author-name" class="author-name">
+      {settings.nome}
+    </p>
+    <p class="author-role">
+      {settings.posicionamento} · {t('footer.registration')} <Placeholder value={settings.oab} />
+    </p>
+    <LinkArrow href={localizePath('/sobre', lang)}>{t('pub.author.link')}</LinkArrow>
+  </div>
+</aside>
+
+<style>
+  .author {
+    display: grid;
+    grid-template-columns: 80px minmax(0, 1fr);
+    gap: var(--space-md);
+    padding-top: var(--space-lg);
+  }
+
+  .author-photo {
+    display: grid;
+    place-items: center;
+    width: 80px;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--color-graphite);
+  }
+
+  .author-photo :global(img[width='160']) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .author-text p {
+    margin: 0;
+  }
+
+  .author-name {
+    margin-top: var(--space-xs) !important;
+    color: var(--color-white);
+    font-size: var(--text-h3);
+    font-weight: var(--weight-light);
+  }
+
+  .author-role {
+    margin-bottom: var(--space-xs) !important;
+    font-size: var(--text-small);
+  }
+
+  .section-label {
+    font-size: var(--text-label);
+  }
+</style>

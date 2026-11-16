@@ -16,6 +16,9 @@ gsap.registerPlugin(ScrollTrigger, SplitText);
 
 let firstPage = true;
 
+// Filtros e "Carregar mais" mudam a altura da página: recalcula as posições.
+document.addEventListener('publications:update', () => ScrollTrigger.refresh());
+
 // Pausa a rolagem suave enquanto o menu ou a busca estão abertos.
 document.addEventListener('dialog:toggle', (event) => {
   const { open } = (event as CustomEvent<DialogToggleDetail>).detail;

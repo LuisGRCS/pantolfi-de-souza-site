@@ -1,0 +1,55 @@
+---
+/** Página inicial: as três publicações mais recentes. */
+import PublicationCard from '@/components/publications/PublicationCard.astro';
+import LinkArrow from '@/components/ui/LinkArrow.astro';
+import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
+import { getAreaNames } from '@/lib/content';
+import { getPublications } from '@/lib/publications';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const recent = (await getPublications()).slice(0, 3);
+const areaNames = await getAreaNames();
+---
+
+{recent.length > 0 && (
+  <section class="section" data-section aria-labelledby="recent-title">
+    <div class="container-site grid-12">
+      <h2 id="recent-title" class="section-label col-label">
+        {t('pub.recent')}
+      </h2>
+      <div class="col-content">
+        <ul class="recent" data-reveal-group>
+          {recent.map((publication) => (
+            <li data-reveal>
+              <PublicationCard publication={publication} areaNames={areaNames} />
+            </li>
+          ))}
+        </ul>
+        <div class="recent-link" data-reveal>
+          <LinkArrow href={localizePath('/publicacoes', lang)}>{t('pub.recent.link')}</LinkArrow>
+        </div>
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .recent {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-xl) var(--grid-gap);
+  }
+
+  @media (min-width: 768px) {
+    .recent {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .recent-link {
+    margin-top: var(--space-xl);
+  }
+</style>

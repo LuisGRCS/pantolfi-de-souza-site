@@ -1,0 +1,38 @@
+---
+/** Linha de informações de uma publicação: tipo, data e áreas. */
+import type { Publication } from '@/lib/publications';
+import { formatDate, isoDate, typeKey } from '@/lib/publications';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+
+interface Props {
+  publication: Publication;
+  areaNames: Record<string, string>;
+  showAreas?: boolean;
+}
+
+const { publication, areaNames, showAreas = true } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
+const { data } = publication;
+const areas = showAreas ? data.areas.map((area) => areaNames[area.id]).filter(Boolean) : [];
+---
+
+<p class="pub-meta">
+  <span class="index-num">{t(typeKey(data.tipo))}</span>
+  <time datetime={isoDate(data.data)}>{formatDate(data.data)}</time>
+  {areas.length > 0 && <span class="pub-areas">{areas.join(', ')}</span>}
+</p>
+
+<style>
+  .pub-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+    margin: 0;
+    font-size: var(--text-small);
+    letter-spacing: 0.01em;
+  }
+
+  .pub-areas {
+    opacity: 0.85;
+  }
+</style>

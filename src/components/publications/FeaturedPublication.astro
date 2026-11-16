@@ -1,0 +1,122 @@
+---
+/** Publicação em destaque no topo da listagem, em formato grande. */
+import { Picture } from 'astro:assets';
+import LinkArrow from '@/components/ui/LinkArrow.astro';
+import Placeholder from '@/components/ui/Placeholder.astro';
+import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
+import type { Publication } from '@/lib/publications';
+import PublicationMeta from './PublicationMeta.astro';
+
+interface Props {
+  publication: Publication;
+  areaNames: Record<string, string>;
+}
+
+const { publication, areaNames } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const { data } = publication;
+const href = localizePath(`/publicacoes/${publication.id}`, lang);
+---
+
+<article
+  class:list={['featured rule-top', { 'featured--cover': data.capa }]}
+  data-pubs-featured
+  data-reveal
+>
+  <p class="section-label featured-label">{t('pub.featured')}</p>
+  {data.capa && (
+    <div class="featured-cover">
+      <Picture
+        src={data.capa}
+        alt={data.capaAlt ?? ''}
+        widths={[640, 960, 1280]}
+        sizes="(min-width: 1024px) 50vw, 90vw"
+        formats={['avif', 'webp']}
+        loading="eager"
+      />
+    </div>
+  )}
+  <div class="featured-text">
+    <PublicationMeta publication={publication} areaNames={areaNames} />
+    <h2 class="featured-title">
+      <a href={href}>
+        <Placeholder value={data.titulo} />
+      </a>
+    </h2>
+    <p class="featured-summary">
+      <Placeholder value={data.resumo} />
+    </p>
+    <LinkArrow href={href}>{t('pub.read')}</LinkArrow>
+  </div>
+</article>
+
+<style>
+  .featured {
+    display: grid;
+    gap: var(--space-lg) var(--grid-gap);
+    padding-block: var(--space-lg) var(--space-xl);
+    margin-bottom: var(--space-xl);
+  }
+
+  .featured[hidden] {
+    display: none;
+  }
+
+  .featured-text {
+    display: grid;
+    gap: var(--space-md);
+    align-content: start;
+  }
+
+  .featured-title {
+    margin: 0;
+    max-width: 22ch;
+    font-size: var(--text-h1);
+    font-weight: var(--weight-light);
+    line-height: var(--leading-tight);
+    letter-spacing: -0.015em;
+  }
+
+  .featured-title a:hover {
+    color: var(--color-gold);
+  }
+
+  .featured-summary {
+    margin: 0;
+    max-width: 52ch;
+    font-size: var(--text-lead);
+    font-weight: var(--weight-light);
+  }
+
+  .featured-cover {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--color-graphite);
+  }
+
+  .featured-cover :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.8);
+  }
+
+  @media (min-width: 1024px) {
+    .featured {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+    .featured-label {
+      grid-column: 1 / span 3;
+    }
+    .featured-text {
+      grid-column: 4 / -1;
+    }
+    .featured--cover .featured-cover {
+      grid-column: 4 / span 4;
+    }
+    .featured--cover .featured-text {
+      grid-column: 8 / -1;
+    }
+  }
+</style>

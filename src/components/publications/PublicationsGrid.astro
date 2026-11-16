@@ -1,0 +1,307 @@
+---
+/**
+ * Listagem com filtros por tipo e por área. Os filtros não recarregam a página
+ * e ficam no endereço (?tipo=artigo&area=…), para poder compartilhar.
+ * Mostra 12 por vez, com o botão "Carregar mais". Sem JavaScript, tudo aparece.
+ */
+import { publicationTypes } from '@/content.config';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import { typeKey, type Publication } from '@/lib/publications';
+import PublicationCard from './PublicationCard.astro';
+
+interface Props {
+  publications: Publication[];
+  areaNames: Record<string, string>;
+  areaOrder: string[];
+}
+
+const { publications, areaNames, areaOrder } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
+const types = publicationTypes.filter((type) => publications.some((p) => p.data.tipo === type));
+const areas = areaOrder.filter((id) =>
+  publications.some((p) => p.data.areas.some((a) => a.id === id)),
+);
+---
+
+<div class="pubs" data-pubs data-page-size="12" data-count-label={t('pub.count')}>
+  <div class="filters" role="group" aria-label={t('pub.filters')} data-pubs-filters hidden>
+    <div class="filter-group" role="group" aria-labelledby="filter-type">
+      <span id="filter-type" class="section-label filter-label">
+        {t('pub.filter.type')}
+      </span>
+      <button type="button" data-filter="tipo" data-value="" aria-pressed="true">
+        {t('pub.filter.all')}
+      </button>
+      {types.map((type) => (
+        <button type="button" data-filter="tipo" data-value={type} aria-pressed="false">
+          {t(typeKey(type))}
+        </button>
+      ))}
+    </div>
+    {areas.length > 0 && (
+      <div class="filter-group" role="group" aria-labelledby="filter-area">
+        <span id="filter-area" class="section-label filter-label">
+          {t('pub.filter.area')}
+        </span>
+        <button type="button" data-filter="area" data-value="" aria-pressed="true">
+          {t('pub.filter.allAreas')}
+        </button>
+        {areas.map((id) => (
+          <button type="button" data-filter="area" data-value={id} aria-pressed="false">
+            {areaNames[id]}
+          </button>
+        ))}
+      </div>
+    )}
+    <p class="filter-status" aria-live="polite" data-pubs-status></p>
+  </div>
+
+  <ul class="grid">
+    {publications.map((publication) => (
+      <li
+        data-pub
+        data-type={publication.data.tipo}
+        data-areas={publication.data.areas.map((area) => area.id).join(' ')}
+        data-reveal
+      >
+        <PublicationCard publication={publication} areaNames={areaNames} />
+      </li>
+    ))}
+  </ul>
+
+  <div class="empty" data-pubs-empty hidden>
+    <p class="empty-title">{t('pub.empty.title')}</p>
+    <p>{t('pub.empty.text')}</p>
+    <button type="button" class="text-button" data-pubs-clear>
+      {t('pub.filter.clear')}
+    </button>
+  </div>
+
+  <div class="more" data-pubs-more-wrap hidden>
+    <button type="button" class="more-button" data-pubs-more>
+      {t('pub.more')}
+    </button>
+  </div>
+</div>
+
+<script>
+  function initPublications() {
+    const root = document.querySelector<HTMLElement>('[data-pubs]');
+    if (!root) return;
+    const filters = root.querySelector<HTMLElement>('[data-pubs-filters]');
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    const items = [...root.querySelectorAll<HTMLElement>('[data-pub]')];
+    const empty = root.querySelector<HTMLElement>('[data-pubs-empty]');
+    const moreWrap = root.querySelector<HTMLElement>('[data-pubs-more-wrap]');
+    const more = root.querySelector<HTMLButtonElement>('[data-pubs-more]');
+    const status = root.querySelector<HTMLElement>('[data-pubs-status]');
+    const featured = document.querySelector<HTMLElement>('[data-pubs-featured]');
+    const pageSize = Number(root.dataset['pageSize'] ?? 12);
+    const label = root.dataset['countLabel'] ?? '';
+
+    const params = new URLSearchParams(window.location.search);
+    const state = {
+      tipo: params.get('tipo') ?? '',
+      area: params.get('area') ?? '',
+      shown: pageSize,
+    };
+
+    // Ignora valores desconhecidos vindos do endereço.
+    (['tipo', 'area'] as const).forEach((key) => {
+      if (!buttons.some((b) => b.dataset['filter'] === key && b.dataset['value'] === state[key])) {
+        state[key] = '';
+      }
+    });
+
+    const render = (moveFocus = false) => {
+      const matches = items.filter(
+        (item) =>
+          (!state.tipo || item.dataset['type'] === state.tipo) &&
+          (!state.area || (item.dataset['areas'] ?? '').split(' ').includes(state.area)),
+      );
+      const firstHidden = items.findIndex((item) => item.hidden);
+      items.forEach((item) => {
+        item.hidden = !matches.slice(0, state.shown).includes(item);
+      });
+      buttons.forEach((button) =>
+        button.setAttribute(
+          'aria-pressed',
+          String(state[button.dataset['filter'] as 'tipo' | 'area'] === button.dataset['value']),
+        ),
+      );
+      const filtered = Boolean(state.tipo || state.area);
+      if (featured) featured.hidden = filtered;
+      if (empty) empty.hidden = matches.length > 0;
+      if (moreWrap) moreWrap.hidden = matches.length <= state.shown;
+      if (status) status.textContent = `${matches.length} ${label}`;
+
+      const url = new URL(window.location.href);
+      url.searchParams.delete('tipo');
+      url.searchParams.delete('area');
+      if (state.tipo) url.searchParams.set('tipo', state.tipo);
+      if (state.area) url.searchParams.set('area', state.area);
+      window.history.replaceState(window.history.state, '', url);
+
+      // Ao carregar mais, o foco vai para o primeiro item novo.
+      if (moveFocus && firstHidden >= 0)
+        items[firstHidden]?.querySelector<HTMLElement>('a')?.focus();
+      root.dispatchEvent(new CustomEvent('publications:update', { bubbles: true }));
+    };
+
+    buttons.forEach((button) =>
+      button.addEventListener('click', () => {
+        const key = button.dataset['filter'] as 'tipo' | 'area';
+        state[key] = button.dataset['value'] ?? '';
+        state.shown = pageSize;
+        render();
+      }),
+    );
+    more?.addEventListener('click', () => {
+      state.shown += pageSize;
+      render(true);
+    });
+    root.querySelector('[data-pubs-clear]')?.addEventListener('click', () => {
+      state.tipo = '';
+      state.area = '';
+      render();
+    });
+
+    if (filters) filters.hidden = false;
+    render();
+  }
+
+  document.addEventListener('astro:page-load', initPublications);
+</script>
+
+<style>
+  .filters {
+    display: grid;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+  }
+
+  .filters[hidden] {
+    display: none;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .filter-label {
+    min-width: 5rem;
+    margin-right: var(--space-xs);
+    font-size: var(--text-label);
+  }
+
+  .filter-group button {
+    min-height: 40px;
+    padding-inline: var(--space-sm);
+    color: var(--color-silver);
+    background: none;
+    border: var(--line-width) solid var(--color-line);
+    font: inherit;
+    font-size: var(--text-small);
+    cursor: pointer;
+    transition:
+      border-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out),
+      background-color var(--duration-fast) var(--ease-out);
+  }
+
+  .filter-group button:hover {
+    border-color: var(--color-gold);
+  }
+
+  .filter-group button[aria-pressed='true'] {
+    color: var(--color-primary);
+    background: var(--color-silver);
+    border-color: var(--color-silver);
+  }
+
+  .filter-status {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: var(--text-small);
+  }
+
+  .grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-xl) var(--grid-gap);
+  }
+
+  .grid > [hidden] {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .empty {
+    padding-block: var(--space-xl);
+    border-top: var(--line-width) solid var(--color-line);
+  }
+
+  .empty-title {
+    margin: 0 0 var(--space-xs);
+    color: var(--color-white);
+    font-size: var(--text-h3);
+    font-weight: var(--weight-light);
+  }
+
+  .empty p {
+    margin: 0;
+  }
+
+  .text-button {
+    margin-top: var(--space-md);
+    padding: 0;
+    color: var(--color-gold);
+    background: none;
+    border: 0;
+    font: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+    cursor: pointer;
+  }
+
+  .more {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--space-xl);
+  }
+
+  .more-button {
+    min-height: 52px;
+    padding-inline: var(--space-lg);
+    color: var(--color-white);
+    background: none;
+    border: var(--line-width) solid var(--color-gold);
+    font: inherit;
+    font-size: var(--text-small);
+    cursor: pointer;
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      background-color var(--duration-fast) var(--ease-out);
+  }
+
+  .more-button:hover {
+    color: var(--color-primary);
+    background: var(--color-gold);
+  }
+</style>

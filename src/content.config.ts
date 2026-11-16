@@ -1,4 +1,4 @@
-import { defineCollection } from 'astro:content';
+import { defineCollection, reference } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
@@ -104,4 +104,46 @@ const sobre = defineCollection({
       .refine(altWhenImage, altMessage),
 });
 
-export const collections = { areas, trajetoria, inicio, sobre };
+export const publicationTypes = [
+  'artigo',
+  'nota-tecnica',
+  'palestra',
+  'entrevista',
+  'evento',
+  'curso-aula',
+  'livro-capitulo',
+] as const;
+export type PublicationType = (typeof publicationTypes)[number];
+
+/**
+ * Publicações (artigos, notas técnicas, palestras, entrevistas…): um arquivo .md por
+ * publicação em src/content/publicacoes. O nome do arquivo vira o endereço da página.
+ * Nunca citar clientes, valores ou resultados de casos (Provimento 205/2021).
+ */
+const publicacoes = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/publicacoes' }),
+  schema: ({ image }) =>
+    z
+      .object({
+        titulo: z.string().min(1),
+        tipo: z.enum(publicationTypes),
+        data: z.coerce.date(),
+        resumo: z.string().min(1).max(220),
+        capa: image().optional(),
+        capaAlt: z.string().optional(),
+        areas: z.array(reference('areas')).default([]),
+        veiculo: z.string().optional(),
+        linkExterno: z.url().optional(),
+        video: z.url().optional(),
+        pdf: z.string().optional(),
+        destaque: z.boolean().default(false),
+        rascunho: z.boolean().default(false),
+        seo,
+      })
+      .refine((data) => !data.capa || Boolean(data.capaAlt?.trim()), {
+        message: 'Descreva a imagem de capa no campo "capaAlt" (texto alternativo).',
+        path: ['capaAlt'],
+      }),
+});
+
+export const collections = { areas, trajetoria, inicio, sobre, publicacoes };

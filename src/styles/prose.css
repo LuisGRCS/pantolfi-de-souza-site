@@ -1,0 +1,151 @@
+/*
+  Tipografia de leitura das publicações: cerca de 68 caracteres por linha,
+  entrelinha 1,7, citações em Lato Light maior com fio dourado à esquerda.
+*/
+.prose {
+  max-width: var(--measure);
+  font-size: var(--text-body);
+  line-height: var(--leading-prose);
+}
+
+.prose > * + * {
+  margin-top: 1.25em;
+}
+
+.prose p {
+  margin-block: 0;
+}
+
+.prose :is(h2, h3, h4) {
+  margin-top: 2.2em;
+  margin-bottom: 0;
+  font-weight: var(--weight-light);
+  line-height: 1.25;
+  scroll-margin-top: calc(var(--header-height) + var(--space-lg));
+}
+
+.prose h2 {
+  font-size: clamp(1.5rem, 1.2vw + 1.1rem, 2rem);
+}
+
+.prose h3 {
+  font-size: var(--text-h3);
+}
+
+.prose :is(h2, h3) + * {
+  margin-top: 0.75em;
+}
+
+.prose a {
+  color: var(--color-white);
+  text-decoration: underline;
+  text-decoration-color: var(--color-gold);
+  text-decoration-thickness: var(--line-width);
+  text-underline-offset: 0.2em;
+}
+
+.prose a:hover {
+  color: var(--color-gold);
+}
+
+.prose strong {
+  color: var(--color-white);
+  font-weight: var(--weight-bold);
+}
+
+.prose :is(ul, ol) {
+  padding-left: 1.25em;
+}
+
+.prose li + li {
+  margin-top: 0.4em;
+}
+
+.prose li::marker {
+  color: var(--color-gold);
+}
+
+/* Citação em destaque */
+.prose blockquote {
+  margin-inline: 0;
+  margin-block: 2em;
+  padding-left: var(--space-md);
+  border-left: var(--line-width) solid var(--color-gold);
+  color: var(--color-white);
+  font-size: var(--text-lead);
+  font-weight: var(--weight-light);
+  line-height: 1.5;
+}
+
+.prose blockquote p + p {
+  margin-top: 0.75em;
+}
+
+.prose hr {
+  height: var(--line-width);
+  margin-block: 2.5em;
+  background: var(--color-line);
+  border: 0;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-small);
+}
+
+.prose :is(th, td) {
+  padding: 0.6em 0.75em;
+  border-bottom: var(--line-width) solid var(--color-line);
+  text-align: left;
+}
+
+/* Chamadas e notas de rodapé */
+.prose sup a {
+  padding-inline: 0.15em;
+  color: var(--color-gold);
+  text-decoration: none;
+  font-size: 0.8em;
+}
+
+.prose .footnotes {
+  margin-top: 3em;
+  padding-top: var(--space-md);
+  border-top: var(--line-width) solid var(--color-line);
+  font-size: var(--text-small);
+}
+
+.prose .footnotes h2 {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0 0 var(--space-sm);
+  overflow: visible;
+  clip: auto;
+  color: var(--color-silver);
+  font-family: var(--font-display);
+  font-size: var(--text-label);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  white-space: normal;
+}
+
+.prose .footnotes ol {
+  margin: 0;
+}
+
+.prose .footnotes a[data-footnote-backref] {
+  margin-left: 0.35em;
+  color: var(--color-gold);
+  text-decoration: none;
+}
+
+.prose :target {
+  scroll-margin-top: calc(var(--header-height) + var(--space-lg));
+}

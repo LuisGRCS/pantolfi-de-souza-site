@@ -1,0 +1,111 @@
+---
+/**
+ * Publicação na listagem. Com capa, a imagem vem acima do texto;
+ * sem capa, o título ganha mais presença. Sem caixas nem sombras: só um fio no topo.
+ */
+import { Picture } from 'astro:assets';
+import Placeholder from '@/components/ui/Placeholder.astro';
+import { getLangFromUrl, localizePath } from '@/i18n/utils';
+import type { Publication } from '@/lib/publications';
+import PublicationMeta from './PublicationMeta.astro';
+
+interface Props {
+  publication: Publication;
+  areaNames: Record<string, string>;
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { publication, areaNames, headingLevel: Heading = 'h3' } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const { data } = publication;
+const href = localizePath(`/publicacoes/${publication.id}`, lang);
+---
+
+<article class:list={['card rule-top', { 'card--cover': data.capa }]}>
+  {data.capa && (
+    <div class="card-cover">
+      <Picture
+        src={data.capa}
+        alt={data.capaAlt ?? ''}
+        widths={[400, 640, 900]}
+        sizes="(min-width: 1024px) 30vw, 90vw"
+        formats={['avif', 'webp']}
+        loading="lazy"
+      />
+    </div>
+  )}
+  <PublicationMeta publication={publication} areaNames={areaNames} />
+  <Heading class="card-title" data-reveal-skip>
+    <a href={href} class="card-link">
+      <Placeholder value={data.titulo} />
+    </a>
+  </Heading>
+  <p class="card-summary">
+    <Placeholder value={data.resumo} />
+  </p>
+</article>
+
+<style>
+  .card {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--space-sm);
+    padding-top: var(--space-md);
+  }
+
+  .card-cover {
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    background: var(--color-graphite);
+  }
+
+  .card-cover :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.8);
+    transition: transform var(--duration-slow) var(--ease-out);
+  }
+
+  .card:hover .card-cover :global(img) {
+    transform: scale(1.03);
+  }
+
+  .card-title {
+    margin: 0;
+    font-size: clamp(1.375rem, 1.1vw + 1rem, 1.875rem);
+    font-weight: var(--weight-light);
+    line-height: 1.25;
+  }
+
+  .card--cover .card-title {
+    font-size: var(--text-h3);
+  }
+
+  /* O link cobre o cartão inteiro */
+  .card-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .card-link {
+    background-image: linear-gradient(var(--color-gold), var(--color-gold));
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 0% var(--line-width);
+    transition: background-size var(--duration-base) var(--ease-out);
+  }
+
+  .card:hover .card-link,
+  .card-link:focus-visible {
+    background-size: 100% var(--line-width);
+  }
+
+  .card-summary {
+    margin: 0;
+    max-width: 52ch;
+    color: var(--color-silver);
+  }
+</style>

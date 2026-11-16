@@ -17,16 +17,18 @@ interface Props {
   /** true quando a página abre com imagem em tela cheia sob o cabeçalho. */
   overlayHeader?: boolean;
   noindex?: boolean;
+  image?: string | undefined;
+  type?: 'website' | 'article' | undefined;
 }
 
-const { title, description, overlayHeader = false, noindex = false } = Astro.props;
+const { title, description, overlayHeader = false, noindex = false, image, type } = Astro.props;
 const lang = getLangFromUrl(Astro.url);
 ---
 
 <!doctype html>
 <html lang={languages[lang]}>
   <head>
-    <Seo title={title} description={description} noindex={noindex} />
+    <Seo title={title} description={description} noindex={noindex} image={image} type={type} />
     <script is:inline transition:persist="movimento-inicial">
       // Ativa o movimento só com JavaScript e sem pedido de movimento reduzido.
       // A abertura aparece uma única vez por sessão. Se o movimento não carregar

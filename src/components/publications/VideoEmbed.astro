@@ -1,0 +1,96 @@
+---
+/**
+ * Vídeo de palestra ou entrevista. Só é carregado do serviço externo
+ * quando a pessoa clica (economiza dados e evita cookies de terceiros).
+ */
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import { embedUrl } from '@/lib/publications';
+
+interface Props {
+  url: string;
+  title: string;
+}
+
+const { url, title } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
+const embed = embedUrl(url);
+---
+
+{embed ? (
+  <div class="video" data-video>
+    <button type="button" class="video-play" data-embed={embed} data-title={title}>
+      <span class="video-icon" aria-hidden="true" />
+      <span>{t('pub.video')}</span>
+    </button>
+    <p class="video-note">
+      {t('pub.video.note')}{' '}
+      <a href={url} class="link-line" target="_blank" rel="noopener">
+        {url.replace(/^https?:\/\//, '')}
+      </a>
+    </p>
+  </div>
+) : (
+  <p>
+    <a href={url} class="link-line" target="_blank" rel="noopener">
+      {t('pub.video')}
+    </a>
+  </p>
+)}
+
+<script>
+  function initVideos() {
+    document.querySelectorAll<HTMLButtonElement>('[data-embed]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const frame = document.createElement('iframe');
+        frame.src = button.dataset['embed'] ?? '';
+        frame.title = button.dataset['title'] ?? '';
+        frame.allow = 'autoplay; fullscreen; picture-in-picture';
+        frame.allowFullscreen = true;
+        frame.className = 'video-frame';
+        button.replaceWith(frame);
+        frame.focus();
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initVideos);
+</script>
+
+<style>
+  .video-play,
+  .video :global(.video-frame) {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 0;
+  }
+
+  .video-play {
+    gap: var(--space-sm);
+    align-content: center;
+    color: var(--color-white);
+    background:
+      linear-gradient(160deg, rgba(42, 49, 54, 0.9), var(--color-primary)), var(--color-primary);
+    border: var(--line-width) solid var(--color-line);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .video-play:hover {
+    border-color: var(--color-gold);
+  }
+
+  .video-icon {
+    width: 0;
+    height: 0;
+    border-block: 12px solid transparent;
+    border-left: 20px solid var(--color-gold);
+  }
+
+  .video-note {
+    margin: var(--space-xs) 0 0;
+    color: var(--color-muted);
+    font-size: var(--text-small);
+  }
+</style>

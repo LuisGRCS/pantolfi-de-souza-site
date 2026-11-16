@@ -1,0 +1,42 @@
+---
+import FeaturedPublication from '@/components/publications/FeaturedPublication.astro';
+import PublicationsGrid from '@/components/publications/PublicationsGrid.astro';
+import PageHeader from '@/components/sections/PageHeader.astro';
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getAreaNames, getAreas } from '@/lib/content';
+import { getPublications } from '@/lib/publications';
+import { settings } from '@/lib/site';
+
+const t = useTranslations(getLangFromUrl(Astro.url));
+const publications = await getPublications();
+const areaNames = await getAreaNames();
+const areaOrder = (await getAreas()).map((area) => area.id);
+const featured = publications.find((p) => p.data.destaque) ?? publications[0];
+const rest = publications.filter((p) => p !== featured);
+---
+
+<BaseLayout
+  title={t('nav.publications')}
+  description={`Artigos, notas técnicas, palestras e entrevistas de ${settings.nome}.`}
+>
+  <PageHeader title={t('nav.publications')} lead={t('pub.lead')} />
+  <section class="section pubs-section" data-section aria-label={t('nav.publications')}>
+    <div class="container-site">
+      {featured ? (
+        <>
+          <FeaturedPublication publication={featured} areaNames={areaNames} />
+          <PublicationsGrid publications={rest} areaNames={areaNames} areaOrder={areaOrder} />
+        </>
+      ) : (
+        <p class="lead">{t('pub.none')}</p>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .pubs-section {
+    padding-top: 0;
+  }
+</style>

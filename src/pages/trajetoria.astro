@@ -5,14 +5,19 @@ import Timeline from '@/components/sections/Timeline.astro';
 import { getLangFromUrl, useTranslations } from '@/i18n/utils';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getTimeline, yearsOfPractice } from '@/lib/content';
+import { getPublications } from '@/lib/publications';
 import { settings } from '@/lib/site';
 
 const t = useTranslations(getLangFromUrl(Astro.url));
 const items = await getTimeline();
 
-// Contagens de publicações e palestras entram com a coleção de publicações (fase 4).
+// Contagens automáticas a partir das publicações cadastradas.
+const publications = await getPublications();
+const talks = publications.filter((p) => p.data.tipo === 'palestra').length;
 const stats = [
   { value: yearsOfPractice(), label: t('career.years'), pending: settings.anoInscricaoOab },
+  { value: publications.length, label: t('career.publications'), pending: '' },
+  { value: talks, label: t('career.talks'), pending: '' },
 ];
 ---
 

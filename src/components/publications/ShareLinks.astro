@@ -1,0 +1,98 @@
+---
+/** Compartilhar: LinkedIn, WhatsApp e copiar link. Sem botões de terceiros (sem rastreamento). */
+import { getLangFromUrl, useTranslations } from '@/i18n/utils';
+
+interface Props {
+  url: string;
+  title: string;
+}
+
+const { url, title } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
+const linkedin = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+const whatsapp = `https://wa.me/?text=${encodeURIComponent(`${title} ${url}`)}`;
+---
+
+<div class="share" data-share>
+  <p class="section-label">{t('pub.share')}</p>
+  <ul>
+    <li>
+      <a class="link-line" href={linkedin} target="_blank" rel="noopener">
+        LinkedIn
+      </a>
+    </li>
+    <li>
+      <a class="link-line" href={whatsapp} target="_blank" rel="noopener">
+        WhatsApp
+      </a>
+    </li>
+    <li>
+      <button
+        type="button"
+        class="link-line copy"
+        data-copy={url}
+        data-copied={t('pub.share.copied')}
+        data-failed={t('pub.share.failed')}
+      >
+        {t('pub.share.copy')}
+      </button>
+    </li>
+  </ul>
+  <p class="share-status" role="status" data-share-status></p>
+</div>
+
+<script>
+  function initShare() {
+    document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const status = button.closest('[data-share]')?.querySelector('[data-share-status]');
+        try {
+          await navigator.clipboard.writeText(button.dataset['copy'] ?? window.location.href);
+          if (status) status.textContent = button.dataset['copied'] ?? '';
+        } catch {
+          if (status) status.textContent = button.dataset['failed'] ?? '';
+        }
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initShare);
+</script>
+
+<style>
+  .share {
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm) var(--space-md);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: var(--text-small);
+  }
+
+  .copy {
+    padding-top: 0;
+    padding-inline: 0;
+    color: inherit;
+    border: 0;
+    font: inherit;
+    cursor: pointer;
+    background-color: transparent;
+  }
+
+  .share-status {
+    min-height: 1.5em;
+    margin: 0;
+    color: var(--color-gold);
+    font-size: var(--text-small);
+  }
+
+  .section-label {
+    font-size: var(--text-label);
+  }
+</style>
