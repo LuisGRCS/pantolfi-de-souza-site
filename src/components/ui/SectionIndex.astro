@@ -1,0 +1,63 @@
+---
+/** Índice de seção ("02 / 06") no canto da tela. Preenchido por src/motion/section-index.ts. */
+---
+
+<div class="section-index" data-section-index hidden aria-hidden="true">
+  <span class="numbers">
+    <span data-current>01</span>
+    <span class="sep">/</span>
+    <span data-total>01</span>
+  </span>
+  <span class="track">
+    <span class="bar" data-progress></span>
+  </span>
+</div>
+
+<style>
+  .section-index {
+    position: fixed;
+    right: var(--gutter);
+    bottom: var(--space-md);
+    z-index: calc(var(--z-header) - 1);
+    display: none;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--color-gold);
+    font-size: var(--text-label);
+    letter-spacing: 0.12em;
+    font-variant-numeric: tabular-nums;
+    transition: color var(--duration-base) var(--ease-out);
+    pointer-events: none;
+  }
+
+  .section-index[data-surface='paper'] {
+    color: var(--color-gold-text);
+  }
+
+  .sep {
+    margin-inline: 0.5em;
+    opacity: 0.6;
+  }
+
+  .track {
+    position: relative;
+    width: 48px;
+    height: var(--line-width);
+    background: color-mix(in srgb, currentColor 30%, transparent);
+    overflow: hidden;
+  }
+
+  .bar {
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+    transform-origin: left;
+    transform: scaleX(var(--progress, 0));
+  }
+
+  @media (min-width: 1024px) {
+    .section-index:not([hidden]) {
+      display: flex;
+    }
+  }
+</style>

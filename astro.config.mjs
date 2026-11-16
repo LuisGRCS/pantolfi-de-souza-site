@@ -7,7 +7,7 @@ export default defineConfig({
   site: 'https://pantolfi.com.br',
   adapter: vercel(),
   trailingSlash: 'never',
-  build: { format: 'file' },
+  build: { assets: 'assets' },
   devToolbar: { enabled: false },
   prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
   i18n: {
@@ -19,5 +19,19 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    // Arquivos finais com nomes neutros (apenas o código de conteúdo).
+    environments: {
+      client: {
+        build: {
+          rolldownOptions: {
+            output: {
+              entryFileNames: 'assets/[hash].js',
+              chunkFileNames: 'assets/[hash].js',
+              assetFileNames: 'assets/[hash][extname]',
+            },
+          },
+        },
+      },
+    },
   },
 });

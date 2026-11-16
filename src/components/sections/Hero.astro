@@ -2,7 +2,8 @@
 import Button from '@/components/ui/Button.astro';
 import Placeholder from '@/components/ui/Placeholder.astro';
 import { getLangFromUrl, localizePath, useTranslations } from '@/i18n/utils';
-import { settings } from '@/lib/site';
+import MaskedWords from '@/components/ui/MaskedWords.astro';
+import { placeholderDisplay, settings } from '@/lib/site';
 
 interface Props {
   tagline: string;
@@ -11,24 +12,32 @@ interface Props {
 const { tagline } = Astro.props;
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+const headline = placeholderDisplay(tagline);
 ---
 
-<section class="hero texture-ps" aria-labelledby="hero-title">
+<section class="hero" aria-labelledby="hero-title" data-section>
+  <div class="hero-media texture-ps" data-hero-media aria-hidden="true"></div>
   <div class="hero-shade" aria-hidden="true"></div>
   <div class="container-site hero-content">
-    <h1 id="hero-title" class="hero-title">
-      <Placeholder value={tagline} />
+    <h1 id="hero-title" class="hero-title" data-reveal-skip>
+      {headline.pending ? (
+        <mark class="placeholder" title={tagline}>
+          <MaskedWords text={headline.text} />
+        </mark>
+      ) : (
+        <MaskedWords text={headline.text} />
+      )}
     </h1>
-    <div class="hero-foot">
-      <span class="hero-rule" aria-hidden="true"></span>
-      <p class="hero-meta">
+    <div class="hero-foot" data-reveal-group>
+      <span class="hero-rule" aria-hidden="true" data-reveal></span>
+      <p class="hero-meta" data-reveal>
         <span>{settings.nome}</span>
         <span>{settings.posicionamento}</span>
         <span>
           {t('footer.registration')} <Placeholder value={settings.oab} />
         </span>
       </p>
-      <div class="hero-actions">
+      <div class="hero-actions" data-reveal>
         <Button href={localizePath('/areas', lang)} arrow>
           {t('hero.areas')}
         </Button>
@@ -52,6 +61,13 @@ const t = useTranslations(lang);
     padding-top: calc(var(--header-height) + var(--space-xl));
     padding-bottom: clamp(3rem, 9vh, 6rem);
     overflow: hidden;
+  }
+
+  .hero-media {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    will-change: transform;
   }
 
   /* Escurece as bordas para dar profundidade ao fundo */

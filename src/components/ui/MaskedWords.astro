@@ -1,0 +1,59 @@
+---
+/**
+ * Título que surge palavra a palavra de dentro de uma máscara, feito só em CSS:
+ * começa no primeiro desenho da página, sem esperar o JavaScript.
+ * Usado no título do hero, o primeiro conteúdo que a pessoa vê.
+ */
+interface Props {
+  text: string;
+}
+
+const words = Astro.props.text.trim().split(/\s+/);
+---
+
+{words.map((word, i) => (
+  <>
+    <span class="mw">
+      <span class="mw-inner" style={`--i: ${i}`}>
+        {word}
+      </span>
+    </span>{' '}
+  </>
+))}
+
+<style>
+  .mw {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    padding-bottom: 0.1em;
+    margin-bottom: -0.1em;
+  }
+
+  .mw-inner {
+    display: inline-block;
+  }
+
+  /* No celular a entrada é um pouco mais curta, para o título aparecer mais cedo */
+  :global(html.motion-ok) .mw-inner {
+    animation: mw-rise 0.8s var(--ease-out) both;
+    animation-delay: calc(var(--mw-delay, 0s) + var(--i) * 0.04s);
+  }
+
+  @media (min-width: 1024px) {
+    :global(html.motion-ok) .mw-inner {
+      animation-duration: 1.1s;
+      animation-delay: calc(var(--mw-delay, 0s) + var(--i) * 0.06s);
+    }
+  }
+
+  :global(html.intro) .mw-inner {
+    --mw-delay: 0.75s;
+  }
+
+  @keyframes mw-rise {
+    from {
+      transform: translateY(105%);
+    }
+  }
+</style>

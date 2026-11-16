@@ -1,0 +1,119 @@
+/*
+  Estados iniciais das animações e transição entre páginas.
+  Tudo aqui só vale com a classe "motion-ok" no <html>, adicionada apenas quando
+  há JavaScript e a pessoa não pediu para reduzir animações. Sem ela, todo o
+  conteúdo aparece imediatamente.
+*/
+
+/* Antes do JavaScript dividir os títulos em linhas */
+html.motion-ok:not([data-motion-ready]) main :is(h1, h2):not([data-reveal-skip]) {
+  opacity: 0;
+}
+
+/* Blocos que surgem ao entrar na tela */
+html.motion-ok [data-reveal] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Rolagem suave (estilos recomendados pelo Lenis) */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* Máscara das linhas dos títulos (criada pelo SplitText) */
+.reveal-line {
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+/* ── Abertura: só na primeira visita da sessão, no máximo 1,2s ── */
+.intro-curtain {
+  display: none;
+}
+
+html.intro .intro-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-intro);
+  display: grid;
+  place-items: center;
+  background: var(--color-primary);
+  pointer-events: none;
+  animation: intro-curtain-up 0.6s var(--ease-out) 0.55s both;
+}
+
+html.intro .intro-curtain img {
+  width: auto;
+  height: clamp(56px, 8vw, 88px);
+  animation: intro-logo-in 0.5s var(--ease-out) both;
+}
+
+@keyframes intro-curtain-up {
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes intro-logo-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* ── Transição entre abas: a página atual se apaga e a nova sobe como cortina ── */
+::view-transition-old(root) {
+  animation: vt-fade-out 0.3s var(--ease-out) both;
+}
+
+::view-transition-new(root) {
+  animation: vt-curtain-in 0.55s var(--ease-out) both;
+}
+
+/* O cabeçalho fica parado durante a transição */
+::view-transition-group(site-header) {
+  animation: none;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-curtain-in {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+  html.intro .intro-curtain {
+    display: none;
+  }
+}

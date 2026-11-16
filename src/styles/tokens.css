@@ -44,10 +44,10 @@
 
   /* ── Tipografia ──────────────────────────────────────────── */
   /* Para ativar a Engravers Gothic BT, troque a linha abaixo por:
-     --font-display: 'Engravers Gothic BT', 'Lato', sans-serif;
+     --font-display: 'Engravers Gothic BT', 'Lato', 'Lato Fallback', sans-serif;
      e ajuste --tracking-caps para 0.14em */
-  --font-display: 'Lato', system-ui, sans-serif; /* só caixa-alta, textos curtos */
-  --font-body: 'Lato', system-ui, sans-serif;
+  --font-display: 'Lato', 'Lato Fallback', sans-serif; /* só caixa-alta, textos curtos */
+  --font-body: 'Lato', 'Lato Fallback', sans-serif;
   --tracking-caps: 0.2em;
   --tracking-tight: -0.01em;
 
@@ -98,6 +98,7 @@
   /* ── Camadas ─────────────────────────────────────────────── */
   --z-header: 50;
   --z-overlay: 100;
+  --z-intro: 200;
 }
 
 @media (min-width: 1024px) {

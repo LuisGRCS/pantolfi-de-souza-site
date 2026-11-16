@@ -31,3 +31,13 @@ const placeholderPattern = /^\[PREENCHER:.*\]$/;
 
 /** Indica se um texto ainda é um marcador [PREENCHER: …]. */
 export const isPlaceholder = (value: string): boolean => placeholderPattern.test(value.trim());
+
+/**
+ * Texto a exibir para um valor que pode ser marcador.
+ * Em "[PREENCHER: descrição — ex.: texto sugerido]", exibe o texto sugerido.
+ */
+export function placeholderDisplay(value: string): { pending: boolean; text: string } {
+  if (!isPlaceholder(value)) return { pending: false, text: value };
+  const example = /—\s*ex\.:\s*(.+)\]$/.exec(value)?.[1]?.trim();
+  return { pending: true, text: example ?? value };
+}

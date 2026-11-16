@@ -1,11 +1,13 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import '@/styles/global.css';
 import Footer from '@/components/layout/Footer.astro';
 import Header from '@/components/layout/Header.astro';
 import MenuOverlay from '@/components/layout/MenuOverlay.astro';
 import SearchModal from '@/components/layout/SearchModal.astro';
-import SkipLink from '@/components/layout/SkipLink.astro';
 import Seo from '@/components/layout/Seo.astro';
+import SkipLink from '@/components/layout/SkipLink.astro';
+import SectionIndex from '@/components/ui/SectionIndex.astro';
 import { getLangFromUrl, languages } from '@/i18n/utils';
 
 interface Props {
@@ -25,14 +27,40 @@ const lang = getLangFromUrl(Astro.url);
 <html lang={languages[lang]}>
   <head>
     <Seo title={title} description={description} noindex={noindex} />
+    <script is:inline transition:persist="movimento-inicial">
+      // Ativa o movimento só com JavaScript e sem pedido de movimento reduzido.
+      // A abertura aparece uma única vez por sessão. Se o movimento não carregar
+      // em 4 segundos, o conteúdo é exibido mesmo assim.
+      (function () {
+        const root = document.documentElement;
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        root.classList.add('motion-ok');
+        try {
+          if (!sessionStorage.getItem('pps-abertura')) {
+            root.classList.add('intro');
+            sessionStorage.setItem('pps-abertura', '1');
+          }
+        } catch {
+          // sem acesso ao armazenamento da sessão: a abertura não é exibida
+        }
+        setTimeout(function () {
+          if (!root.hasAttribute('data-motion-ready')) root.classList.remove('motion-ok', 'intro');
+        }, 4000);
+      })();
+    </script>
+    <ClientRouter fallback="animate" />
   </head>
   <body>
+    <div class="intro-curtain" aria-hidden="true">
+      <img src="/marca/simbolo_dourado-fundo-escuro.svg" width="80" height="89" alt="" />
+    </div>
     <SkipLink />
     <Header overlay={overlayHeader} />
     <main id="conteudo" tabindex="-1" class:list={{ 'offset-header': !overlayHeader }}>
       <slot />
     </main>
     <Footer />
+    <SectionIndex />
     <MenuOverlay />
     <SearchModal />
     <script>

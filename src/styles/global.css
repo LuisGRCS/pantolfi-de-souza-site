@@ -1,9 +1,33 @@
 @import 'tailwindcss';
 @import './tokens.css';
+@import './motion.css';
 @import '@fontsource/lato/latin-300.css';
 @import '@fontsource/lato/latin-400.css';
 @import '@fontsource/lato/latin-400-italic.css';
 @import '@fontsource/lato/latin-700.css';
+
+/*
+  Fonte provisória com as mesmas medidas da Lato: enquanto a Lato carrega,
+  o texto ocupa exatamente o mesmo espaço (evita que a página "pule").
+*/
+@font-face {
+  font-family: 'Lato Fallback';
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans');
+  font-weight: 100 349;
+  size-adjust: 93.43%;
+  ascent-override: 105.64%;
+  descent-override: 22.8%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Lato Fallback';
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans');
+  font-weight: 350 900;
+  size-adjust: 96.04%;
+  ascent-override: 102.77%;
+  descent-override: 22.18%;
+  line-gap-override: 0%;
+}
 
 /*
   O Tailwind lê os tokens de tokens.css. Os nomes das classes (bg-primary, text-gold…)

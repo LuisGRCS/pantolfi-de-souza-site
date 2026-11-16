@@ -2,35 +2,33 @@
 /**
  * Mostra de forma visível um dado que ainda falta preencher.
  * Formato: [PREENCHER: descrição] ou [PREENCHER: descrição — ex.: texto sugerido].
- * Quando há sugestão, ela aparece contornada para dar ideia do resultado final.
+ * Quando há sugestão, ela aparece destacada para dar ideia do resultado final.
  * Se o texto já estiver preenchido, ele aparece normalmente.
  */
-import { isPlaceholder } from '@/lib/site';
+import { placeholderDisplay } from '@/lib/site';
 
 interface Props {
   value: string;
 }
 
 const { value } = Astro.props;
-const pending = isPlaceholder(value);
-const example = pending ? /—\s*ex\.:\s*(.+)\]$/.exec(value)?.[1]?.trim() : undefined;
+const { pending, text } = placeholderDisplay(value);
 ---
 
 {pending ? (
   <mark class="placeholder" title={value}>
-    {example ?? value}
+    {text}
   </mark>
 ) : (
-  value
+  text
 )}
 
-<style>
+<style is:global>
+  /* global: também usado no título do hero (src/components/sections/Hero.astro) */
   .placeholder {
-    background: none;
+    background: color-mix(in srgb, var(--color-gold) 22%, transparent);
     color: inherit;
     font: inherit;
-    outline: var(--line-width) dashed var(--color-gold);
-    outline-offset: 0.12em;
     padding-inline: 0.15em;
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
