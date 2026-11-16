@@ -7,10 +7,16 @@ import { z } from 'astro/zod';
  * incompleto ou com formato errado, o site não é publicado e o erro aponta o campo.
  */
 
+/** O painel salva campos opcionais vazios como "" ou null: aqui viram "não preenchido". */
+const empty = (value: unknown) =>
+  value === null || (typeof value === 'string' && value.trim() === '') ? undefined : value;
+const optionalText = z.preprocess(empty, z.string().optional());
+const optionalUrl = z.preprocess(empty, z.url().optional());
+
 const seo = z
   .object({
-    titulo: z.string().optional(),
-    descricao: z.string().max(170).optional(),
+    titulo: optionalText,
+    descricao: z.preprocess(empty, z.string().max(170).optional()),
   })
   .optional();
 
@@ -42,7 +48,7 @@ const trajetoria = defineCollection({
     tipo: z.enum(timelineTypes),
     cargo: z.string().min(1),
     instituicao: z.string().min(1),
-    descricao: z.string().optional(),
+    descricao: optionalText,
     destaque: z.boolean().default(false),
   }),
 });
@@ -68,10 +74,10 @@ const inicio = defineCollection({
     z
       .object({
         tagline: z.string().min(1),
-        imagemHero: image().optional(),
+        imagemHero: z.preprocess(empty, image().optional()),
         bioCurta: z.string().min(1),
-        retrato: image().optional(),
-        retratoAlt: z.string().optional(),
+        retrato: z.preprocess(empty, image().optional()),
+        retratoAlt: optionalText,
         principios: z.array(principle).min(3).max(4),
         contatoTitulo: z.string().min(1),
         seo,
@@ -87,8 +93,8 @@ const sobre = defineCollection({
       .object({
         titulo: z.string().min(1),
         abertura: z.string().min(1),
-        retrato: image().optional(),
-        retratoAlt: z.string().optional(),
+        retrato: z.preprocess(empty, image().optional()),
+        retratoAlt: optionalText,
         biografia: z.array(z.string().min(1)).min(1),
         formacao: z.array(
           z.object({
@@ -129,13 +135,13 @@ const publicacoes = defineCollection({
         tipo: z.enum(publicationTypes),
         data: z.coerce.date(),
         resumo: z.string().min(1).max(220),
-        capa: image().optional(),
-        capaAlt: z.string().optional(),
+        capa: z.preprocess(empty, image().optional()),
+        capaAlt: optionalText,
         areas: z.array(reference('areas')).default([]),
-        veiculo: z.string().optional(),
-        linkExterno: z.url().optional(),
-        video: z.url().optional(),
-        pdf: z.string().optional(),
+        veiculo: optionalText,
+        linkExterno: optionalUrl,
+        video: optionalUrl,
+        pdf: optionalText,
         destaque: z.boolean().default(false),
         rascunho: z.boolean().default(false),
         seo,

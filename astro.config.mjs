@@ -3,11 +3,16 @@ import { defineConfig } from 'astro/config';
 import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
 import { satteri } from '@astrojs/markdown-satteri';
+import react from '@astrojs/react';
+import keystatic from '@keystatic/astro';
 import { placeholderPlugin } from './src/lib/markdown-placeholder.ts';
 
 export default defineConfig({
   site: 'https://pantolfi.com.br',
   adapter: vercel(),
+  // Painel de edição: /keystatic (o endereço /admin leva até ele)
+  integrations: [react(), keystatic()],
+  redirects: { '/admin': '/keystatic' },
   trailingSlash: 'never',
   build: { assets: 'assets' },
   devToolbar: { enabled: false },
